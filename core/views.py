@@ -4,6 +4,7 @@ from .models import Product
 from .serializers import ProductSerializer
 
 
+# TODO add filtration/ordering
 class IndexView(generics.ListAPIView):
     queryset = Product.objects.all().order_by('id')
     serializer_class = ProductSerializer

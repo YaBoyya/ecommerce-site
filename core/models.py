@@ -13,6 +13,10 @@ class ECommerceModel(models.Model):
             self.modified_at = timezone.now()
         super().save(force_insert, force_update, using, update_fields)
 
+    def delete(self):
+        self.deleted_at = timezone.now()
+        super().save()
+
 
 class Product(ECommerceModel):
     name = models.CharField(_('Name'), max_length=150)

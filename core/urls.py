@@ -1,16 +1,20 @@
-from django.urls import path
-
-from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
 
 app_name = 'core'
-urlpatterns = [
-    path('management/product/<str:pk>', views.ProductManagement.as_view(),
-         name='product-management'),
+router = DefaultRouter()
 
-    path('index', views.IndexView.as_view(), name='index'),
-]
+router.register('management/product', views.ProductManagementViewSet,
+                basename='m-product')
+router.register('management/product-category', views.ProductCategoryManagement,
+                basename='m-product-category')
+router.register('management/product-inventory',
+                views.ProductInventoryManagement,
+                basename='m-product-inventory')
+router.register('management/discount', views.DiscountManagement,
+                basename='m-discount')
+router.register('index', views.IndexViewSet, basename='index')
 
-urlpatterns += format_suffix_patterns(urlpatterns)
+urlpatterns = router.urls

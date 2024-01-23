@@ -1,16 +1,31 @@
-from rest_framework import generics
+from rest_framework import viewsets
 
-from .models import Product
-from .serializers import ProductSerializer
+from . import serializers
+from .models import Discount, Product, ProductCategory, ProductInventory
 
 
 # TODO add filtration/ordering
-class IndexView(generics.ListAPIView):
+class IndexViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all().order_by('id')
-    serializer_class = ProductSerializer
+    serializer_class = serializers.ProductSerializer
 
 
 # TODO restrict to only staff members
-class ProductManagement(generics.RetrieveUpdateDestroyAPIView):
+class ProductManagementViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = serializers.ProductSerializer
+
+
+class ProductCategoryManagement(viewsets.ModelViewSet):
+    queryset = ProductCategory.objects.all()
+    serializer_class = serializers.ProductCategorySerializer
+
+
+class ProductInventoryManagement(viewsets.ModelViewSet):
+    queryset = ProductInventory.objects.all()
+    serializer_class = serializers.ProductInventorySerializer
+
+
+class DiscountManagement(viewsets.ModelViewSet):
+    queryset = Discount.objects.all()
+    serializer_class = serializers.DiscountSerializer

@@ -35,11 +35,11 @@ def generate_product():
                     'name': name,
                     'desc': faker.text(max_nb_chars=100),
                     'SKU': f'{i}{name[:2]}{faker.random_number(5)}',
-                    'category_id':
+                    'category':
                         random.randrange(1, product_category_count + 1),
-                    'inventory_id': i,
+                    'inventory': i,
                     'price': round(random.uniform(0, 100), 2),
-                    'discount_id': random.choice(
+                    'discount': random.choice(
                         [None, random.randrange(1, discount_count + 1)]),
                     'created_at': generate_time()
                 }

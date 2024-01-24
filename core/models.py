@@ -1,10 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_delete, pre_delete
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-# TODO create custom on_delete=models.CASCADE to update deleted_at
-# unless symmetrical delete of 1-1 rel
 class ECommerceModel(models.Model):
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('Modified at'), null=True)
@@ -20,6 +19,12 @@ class ECommerceModel(models.Model):
         super().save(force_insert, force_update, using, update_fields)
 
     def delete(self):
+        pre_delete.send(sender=self.__class__, instance=self)
+        self.deleted_at = timezone.now()
+        post_delete.send(sender=self.__class__, instance=self)
+        super().save()
+
+    def _delete_no_signals(self):
         self.deleted_at = timezone.now()
         super().save()
 

@@ -5,7 +5,6 @@ from .mixins import ProductSearchMixin, SearchMixin
 from .models import Discount, Product, ProductCategory, ProductInventory
 
 
-# TODO add filtration/ordering
 class IndexViewSet(ProductSearchMixin,
                    viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all().order_by('id')

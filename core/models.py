@@ -4,10 +4,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-class ECommerceModel(models.Model):
+class BaseECommerceModel(models.Model):
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
     modified_at = models.DateTimeField(_('Modified at'), null=True)
-    deleted_at = models.DateTimeField(_('Deleted at'), default=None, null=True)
 
     class Meta:
         abstract = True
@@ -17,6 +16,13 @@ class ECommerceModel(models.Model):
         if self.pk:
             self.modified_at = timezone.now()
         super().save(force_insert, force_update, using, update_fields)
+
+
+class ECommerceModel(BaseECommerceModel):
+    deleted_at = models.DateTimeField(_('Deleted at'), default=None, null=True)
+
+    class Meta:
+        abstract = True
 
     def delete(self):
         pre_delete.send(sender=self.__class__, instance=self)

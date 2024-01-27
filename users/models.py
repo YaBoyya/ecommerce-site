@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from phone_field.models import PhoneField
 
 from core.models import BaseECommerceModel
+from users.managers import ECommerceUserManager
 
 
 class ECommerceUser(BaseECommerceModel, AbstractBaseUser):
@@ -13,11 +14,14 @@ class ECommerceUser(BaseECommerceModel, AbstractBaseUser):
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     email = models.EmailField(_('email address'), unique=True)
     is_staff = models.BooleanField(_('staff status'), default=False)
-    is_admin = models.BooleanField(_('admin status'), default=False)
+    is_superuser = models.BooleanField(_('superuser status'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
 
-    # TODO overwrite create_user methods and remove usernames,
-    # and clean for email
+    objects = ECommerceUserManager()
+
+    def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalizer_email(self.email)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -37,4 +41,3 @@ class UserAddress(models.Model):
     country = models.CharField(_('country'), max_length=150, blank=True)
     telephone = PhoneField(_('telephone'))
     mobile = PhoneField(_('mobile'))
-

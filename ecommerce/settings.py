@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 
 from dotenv import load_dotenv
 from pathlib import Path
+
+from rest_framework.settings import api_settings
 
 
 load_dotenv()
@@ -48,6 +51,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
 
     'rest_framework',
+    'knox',
     'debug_toolbar',
 ]
 
@@ -144,6 +148,17 @@ AUTH_USER_MODEL = 'users.ECommerceUser'
 
 # TODO later on increase pagination
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': 'knox.auth.TokenAuthentication',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', # noqa
     'PAGE_SIZE': 25,
+}
+
+REST_KNOW = {
+    'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+    'AUTH_TOKEN_CHARACTER_LENGTH': 64,  # default: 64
+    'TOKEN_TTL': timedelta(hours=2),  # default: 10 hours
+    'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+    'TOKEN_LIMIT_PER_USER': None,  # default: None
+    'AUTO_REFRESH': False,
+    'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT
 }

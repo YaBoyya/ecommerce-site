@@ -24,13 +24,13 @@ class AuthSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        username = attrs.get('username')
         password = attrs.get('password')
 
-        if email and password:
+        if username and password:
             user = authenticate(
                 request=self.context.get('request'),
-                email=email,
+                username=username,
                 password=password
             )
             if not user:

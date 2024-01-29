@@ -2,6 +2,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager
 
 
+# kinda depracated
 class ECommerceUserManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         if not email:

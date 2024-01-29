@@ -6,9 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from phone_field.models import PhoneField
 
 from core.models import BaseECommerceModel
-from users.managers import ECommerceUserManager
 
 
+# TODO add oauth2
 class ECommerceUser(BaseECommerceModel, AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
@@ -16,10 +16,6 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
     is_staff = models.BooleanField(_('staff status'), default=False)
     is_superuser = models.BooleanField(_('superuser status'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
-
-    objects = ECommerceUserManager()
-
-    USERNAME_FIELD = 'email'
 
     def clean(self):
         super().clean()

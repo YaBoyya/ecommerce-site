@@ -148,17 +148,17 @@ AUTH_USER_MODEL = 'users.ECommerceUser'
 
 # TODO later on increase pagination
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': 'knox.auth.TokenAuthentication',
+    'DEFAULT_AUTHENTICATION_CLASSES': ['knox.auth.TokenAuthentication'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', # noqa
     'PAGE_SIZE': 25,
 }
 
-REST_KNOW = {
+REST_KNOX = {
     'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
     'AUTH_TOKEN_CHARACTER_LENGTH': 64,  # default: 64
     'TOKEN_TTL': timedelta(hours=2),  # default: 10 hours
     'USER_SERIALIZER': 'knox.serializers.UserSerializer',
-    'TOKEN_LIMIT_PER_USER': None,  # default: None
+    'TOKEN_LIMIT_PER_USER': 5,  # default: None
     'AUTO_REFRESH': False,
-    'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT
+    'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
 }

@@ -6,9 +6,11 @@ from .models import Product, ProductInventory
 
 @receiver(post_delete, sender=Product)
 def delete_product_inventory(sender, instance, **kwargs):
-    instance.inventory._delete_no_signals()
+    if instance.inventory:
+        instance.inventory._delete_no_signals()
 
 
 @receiver(post_delete, sender=ProductInventory)
 def delete_product(sender, instance, **kwargs):
-    instance.product._delete_no_signals()
+    if instance.product:
+        instance.product._delete_no_signals()

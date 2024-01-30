@@ -28,11 +28,11 @@ class ECommerceModel(BaseECommerceModel):
         pre_delete.send(sender=self.__class__, instance=self)
         self.deleted_at = timezone.now()
         post_delete.send(sender=self.__class__, instance=self)
-        super().save()
+        super(BaseECommerceModel, self).save()
 
     def _delete_no_signals(self):
         self.deleted_at = timezone.now()
-        super().save()
+        super(BaseECommerceModel, self).save()
 
 
 class Product(ECommerceModel):

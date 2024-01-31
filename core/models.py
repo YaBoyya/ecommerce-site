@@ -72,8 +72,9 @@ class ProductInventory(ECommerceModel):
 class Discount(ECommerceModel):
     name = models.CharField(_('Name'), max_length=150)
     desc = models.TextField(_('Description'), max_length=500)
-    discount_percent = models.DecimalField(max_digits=3, decimal_places=0)
-    active = models.BooleanField(default=False)
+    discount_percent = models.DecimalField(_('discount percentage'),
+                                           max_digits=3, decimal_places=0)
+    is_active = models.BooleanField(_('active'), default=False)
 
     class Meta:
         verbose_name_plural = 'Discounts'

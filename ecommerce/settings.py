@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'core.apps.CoreConfig',
+    'shopping.apps.ShoppingConfig',
     'users.apps.UsersConfig',
 
     'rest_framework',

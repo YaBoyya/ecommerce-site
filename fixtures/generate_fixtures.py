@@ -95,7 +95,7 @@ def generate_discount():
                     'name': faker.word(),
                     'desc': faker.text(max_nb_chars=100),
                     'discount_percent': random.randrange(1, 101),
-                    'active': bool(random.getrandbits(1)),
+                    'is_active': bool(random.getrandbits(1)),
                     'created_at': generate_time()
                 }
             }

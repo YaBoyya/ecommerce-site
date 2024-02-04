@@ -14,7 +14,7 @@ class ShoppingSession(BaseECommerceModel):
 
 class CartItem(BaseECommerceModel):
     session = models.ForeignKey(ShoppingSession,
-                                related_name='cart_item',
+                                related_name='cart_items',
                                 on_delete=models.CASCADE)
     product = models.ForeignKey('core.Product', on_delete=models.CASCADE)
     quantity = models.IntegerField(_('quantity'), default=1)

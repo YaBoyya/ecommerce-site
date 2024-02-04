@@ -1,7 +1,7 @@
 from django.contrib.auth import login
 
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from knox.views import LoginView as KnoxLoginView
 
@@ -27,6 +27,7 @@ class LoginView(KnoxLoginView):
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user

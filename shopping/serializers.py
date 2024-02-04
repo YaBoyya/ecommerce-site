@@ -10,7 +10,8 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class ShoppingSessionSerializer(serializers.ModelSerializer):
+    cart_items = CartItemSerializer(many=True, read_only=True)
+
     class Meta:
         model = ShoppingSession
         fields = '__all__'
-        depth = 1

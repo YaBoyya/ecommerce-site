@@ -1,6 +1,6 @@
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from shopping.models import ShoppingSession, CartItem
@@ -20,20 +20,12 @@ class ShoppingSessionView(APIView):
 
 
 # TODO Maybe change the url to something like product/<str:pk>/add
-class CartItemView(APIView):
+class CartItemViewSet(ModelViewSet):
+    serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_query(self):
+    def get_queryset(self):
         return CartItem.objects.filter(session__user=self.request.user)
 
-    def get(self, request, format=None):
-        items = self.get_query()
-        serializer = CartItemSerializer(items, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = CartItemSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+# TODO add summation of price in shopping sess
 # TODO check how ordering products without account is done

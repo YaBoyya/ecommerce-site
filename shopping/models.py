@@ -8,8 +8,6 @@ class ShoppingSession(BaseECommerceModel):
     user = models.OneToOneField('users.ECommerceUser',
                                 on_delete=models.CASCADE,
                                 null=True, blank=True)
-    total = models.DecimalField(_('total'), max_digits=5, decimal_places=2,
-                                default=0)
 
 
 class CartItem(BaseECommerceModel):

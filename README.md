@@ -28,6 +28,7 @@ As a user:
 [ ] I want to be able to use shopping without the need of having an account
 
 
+TODO Redis shopping cart storage
 TODO Filtering and sorting products
 TODO Filtering by category etc (fancy)
 TODO Order History

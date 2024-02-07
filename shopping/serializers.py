@@ -2,23 +2,23 @@ from django.db.models import Sum
 
 from rest_framework import serializers
 
-from shopping.models import CartItem, ShoppingSession
+from shopping.models import OrderItems, OrderDetails
 
 
-class CartItemSerializer(serializers.ModelSerializer):
+class OrderItemsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CartItem
+        model = OrderItems
         fields = '__all__'
 
 
-class ShoppingSessionSerializer(serializers.ModelSerializer):
-    cart_items = CartItemSerializer(many=True, read_only=True)
+class OrderDetailsSerializer(serializers.ModelSerializer):
+    cart_items = OrderItemsSerializer(many=True, read_only=True)
     total = serializers.SerializerMethodField('get_total')
 
     class Meta:
-        model = ShoppingSession
+        model = OrderDetails
         fields = '__all__'
 
     def get_total(self, obj):
-        return CartItem.objects.filter(session=obj)\
+        return OrderItems.objects.filter(order=obj)\
             .aggregate(total=Sum('product__price'))

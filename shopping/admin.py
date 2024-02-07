@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from shopping.models import CartItem, ShoppingSession
+from shopping.models import OrderDetails, OrderItems
 
 
-admin.site.register([CartItem, ShoppingSession])
+admin.site.register([OrderDetails, OrderItems])

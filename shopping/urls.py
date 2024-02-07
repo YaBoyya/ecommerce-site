@@ -2,16 +2,16 @@ from django.urls import path
 
 from rest_framework.routers import DefaultRouter
 
-from shopping.views import CartItemViewSet, ShoppingSessionView
+from shopping.views import OrderDetailsView, OrderItemsViewSet
 
 
 router = DefaultRouter()
 app_name = 'shopping'
 
-router.register('cart/item', CartItemViewSet, basename='item')
+router.register('order/item', OrderItemsViewSet, basename='item')
 
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('cart/', ShoppingSessionView.as_view(), name='cart'),
+    path('order/', OrderDetailsView.as_view(), name='order'),
 ]

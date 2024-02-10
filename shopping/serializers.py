@@ -13,7 +13,7 @@ class OrderItemsSerializer(serializers.ModelSerializer):
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
     order_items = OrderItemsSerializer(many=True, read_only=True)
-    total = serializers.SerializerMethodField('get_total')
+    total = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderDetails
@@ -21,4 +21,4 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
 
     def get_total(self, obj):
         return OrderItems.objects.filter(order=obj)\
-            .aggregate(total=Sum('product__price'))
+            .aggregate(total=Sum('product__price')).get('total')

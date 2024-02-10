@@ -11,19 +11,19 @@ from shopping.serializers import OrderDetailsSerializer, OrderItemsSerializer
 class OrderDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
+    def get_queryset(self):
         return OrderDetails.objects.filter(user=self.request.user)
 
     # TODO decide what it should show either list or latest order
     def get(self, request, format=None):
-        session = self.get_object()
+        session = self.get_queryset()
         serializer = OrderDetailsSerializer(session, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
         serializer = OrderDetailsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

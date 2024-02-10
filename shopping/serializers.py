@@ -12,7 +12,7 @@ class OrderItemsSerializer(serializers.ModelSerializer):
 
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
-    cart_items = OrderItemsSerializer(many=True, read_only=True)
+    order_items = OrderItemsSerializer(many=True, read_only=True)
     total = serializers.SerializerMethodField('get_total')
 
     class Meta:

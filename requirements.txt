@@ -9,7 +9,7 @@ django-rest-knox==4.2.0
 djangorestframework==3.14.0
 Faker==22.5.0
 pillow==10.2.0
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pycparser==2.21
 python-dateutil==2.8.2
 python-dotenv==1.0.0

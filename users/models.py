@@ -17,9 +17,9 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
     is_superuser = models.BooleanField(_('superuser status'), default=False)
     is_active = models.BooleanField(_('active'), default=True)
 
-    def clean(self):
-        super().clean()
-        self.email = self.__class__.objects.normalizer_email(self.email)
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        self.email = self.__class__.objects.normalize_email(self.email)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

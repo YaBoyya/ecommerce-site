@@ -22,10 +22,11 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         self.email = self.__class__.objects.normalize_email(self.email)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         if self._password is not None:
+            password_validation.validate_password(self._password, self)
             password_validation.password_changed(self._password, self)
             self._password = None
+        super().save(*args, **kwargs)
 
 
 class UserAddress(models.Model):

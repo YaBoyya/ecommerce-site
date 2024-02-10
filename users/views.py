@@ -1,10 +1,14 @@
 from django.contrib.auth import login
 
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.views import APIView
 
 from knox.views import LoginView as KnoxLoginView
 
+from shopping.models import OrderDetails
+from shopping.serializers import OrderDetailsSerializer
 from users.serializers import UserSerializer, AuthSerializer
 
 
@@ -31,3 +35,16 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class OrderHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return OrderDetails.objects.filter(user=self.request.user)\
+            .order_by('created_at')
+
+    def get(self, request, format=None):
+        history = self.get_queryset()
+        serializer = OrderDetailsSerializer(history, many=True)
+        return Response(serializer.data)

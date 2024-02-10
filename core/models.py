@@ -6,20 +6,21 @@ from django.utils.translation import gettext_lazy as _
 
 class BaseECommerceModel(models.Model):
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
-    modified_at = models.DateTimeField(_('Modified at'), null=True)
+    modified_at = models.DateTimeField(_('Modified at'), blank=True, null=True)  # noqa
 
     class Meta:
         abstract = True
 
     def save(self, force_insert=False, force_update=False,
              using=None, update_fields=None):
-        if self.pk:
+        if not self._state.adding:
             self.modified_at = timezone.now()
         super().save(force_insert, force_update, using, update_fields)
+        self.clean_fields()
 
 
 class ECommerceModel(BaseECommerceModel):
-    deleted_at = models.DateTimeField(_('Deleted at'), default=None, null=True)
+    deleted_at = models.DateTimeField(_('Deleted at'), blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -46,7 +47,7 @@ class Product(ECommerceModel):
                                      related_name='product',
                                      on_delete=models.CASCADE)
     price = models.FloatField(_('Price'))
-    discount = models.ForeignKey('core.Discount', null=True,
+    discount = models.ForeignKey('core.Discount', blank=True, null=True,
                                  related_name='product',
                                  on_delete=models.SET_NULL)
 

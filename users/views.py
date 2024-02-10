@@ -12,7 +12,6 @@ from shopping.serializers import OrderDetailsSerializer
 from users.serializers import UserSerializer, AuthSerializer
 
 
-# TODO setup a viewset for this
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
 

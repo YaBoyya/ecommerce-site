@@ -1,18 +1,22 @@
 from django.test import TestCase
 
-from core.models import Product
+from core.models import Product, ProductCategory, ProductInventory
 
 
 class TestECommerceModel(TestCase):
     def setUp(self):
+        self.category = ProductCategory.objects.create(
+            name='test', desc='test')
+        self.inventory = ProductInventory.objects.create(quantity=10)
         self.product_data = {
             'name': 'test',
             'desc': "It's a test",
             'SKU': 'SKUNUMBER',
             'price': '12.73',
+            'category': self.category,
+            'inventory': self.inventory
         }
         self.model = Product.objects.create(**self.product_data)
-        pass
 
     def test_save(self):
         """

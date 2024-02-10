@@ -19,6 +19,7 @@ As a user:
 
 Shopping app
 As a user:
+[o] I want to be a ble to check order history
 [ ] I want to be able to add products to my cart
 [ ] I want to be able to delete products from my cart
 [ ] I want to be able to delete all products from my cart
@@ -31,7 +32,7 @@ As a user:
 TODO Redis shopping cart storage
 TODO Filtering and sorting products
 TODO Filtering by category etc (fancy)
-TODO Order History
+TODO Order History details, probably after payment is
 TODO User reviews and comments
 TODO Wishlist
 TODO User notification when a product from a wishlist is on a discount

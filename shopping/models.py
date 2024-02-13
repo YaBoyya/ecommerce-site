@@ -9,10 +9,13 @@ class OrderDetails(BaseECommerceModel):
                              on_delete=models.CASCADE,
                              null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = 'OrderDetails'
 
-class OrderItems(BaseECommerceModel):
+
+class OrderItem(BaseECommerceModel):
     order = models.ForeignKey(OrderDetails,
-                              related_name='order_items',
+                              related_name='items',
                               on_delete=models.CASCADE)
     product = models.ForeignKey('core.Product', on_delete=models.CASCADE)
     quantity = models.IntegerField(_('quantity'), default=1)

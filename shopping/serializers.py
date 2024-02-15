@@ -22,3 +22,21 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
     def get_total(self, obj):
         return OrderItem.objects.filter(order=obj)\
             .aggregate(total=Sum('product__price')).get('total')
+
+
+class CartItemSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField()
+    order = serializers.IntegerField()
+    product = serializers.IntegerField()
+
+    class Meta:
+        fields = '__all__'
+
+
+class CartDetailsSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    total = serializers.FloatField()
+    user = serializers.IntegerField()
+
+    class Meta:
+        fields = '__all__'

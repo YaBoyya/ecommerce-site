@@ -13,6 +13,6 @@ router.register('order/item', views.OrderItemsViewSet, basename='order-item')
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('order/', views.OrderDetailsView.as_view(), name='order'),
+    path('profile/order/', views.OrderDetailsView.as_view(), name='order'),
     path('cart/', views.CartDetailsView.as_view(), name='cart'),
 ]

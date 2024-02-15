@@ -7,25 +7,32 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from shopping.models import OrderDetails, OrderItem
-from shopping.serializers import OrderDetailsSerializer, OrderItemSerializer
+from shopping.serializers import (CartDetailsSerializer,
+                                  OrderDetailsSerializer,
+                                  OrderItemSerializer)
 
 
-# TODO set up serializer for cart
-# TODO finally create class for redis - data communication
 class CartDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         data = cache.get(request.user.id)
-        if data:
-            return Response(data, status=status.HTTP_200_OK)
-        return Response({'error': 'No data assigned to the given key.'},
-                        status=status.HTTP_204_NO_CONTENT)
+        if not data:
+            return Response({'error': 'No data assigned to the given key.'},
+                            status=status.HTTP_204_NO_CONTENT)
+
+        serializer = CartDetailsSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
         data = request.data
-        cache.set(request.user.id, data)
-        return Response(data, status=status.HTTP_201_CREATED)
+        data.update({'user': request.user.id})
+
+        serializer = CartDetailsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cache.set(request.user.id, serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OrderDetailsView(APIView):

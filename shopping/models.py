@@ -4,15 +4,20 @@ from django.utils.translation import gettext_lazy as _
 from core.models import BaseECommerceModel
 
 
+# TODO add total cost to the model
 class OrderDetails(BaseECommerceModel):
     user = models.ForeignKey('users.ECommerceUser',
                              on_delete=models.CASCADE,
                              null=True, blank=True)
+    total = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        verbose_name_plural = 'OrderDetails'
 
 
-class OrderItems(BaseECommerceModel):
+class OrderItem(BaseECommerceModel):
     order = models.ForeignKey(OrderDetails,
-                              related_name='order_items',
+                              related_name='items',
                               on_delete=models.CASCADE)
     product = models.ForeignKey('core.Product', on_delete=models.CASCADE)
     quantity = models.IntegerField(_('quantity'), default=1)

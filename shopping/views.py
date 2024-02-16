@@ -1,11 +1,57 @@
+from django.core.cache import cache
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
-from shopping.models import OrderDetails, OrderItems
-from shopping.serializers import OrderDetailsSerializer, OrderItemsSerializer
+from shopping.models import OrderDetails, OrderItem
+from shopping.serializers import (CartDetailsSerializer,
+                                  OrderDetailsSerializer,
+                                  OrderItemSerializer)
+
+
+def get_cart(id):
+    data = cache.get(id)
+    if not data:
+        return Response({'error': 'No data assigned to the given key.'},
+                        status=status.HTTP_204_NO_CONTENT)
+    return data
+
+
+class CheckoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        data = get_cart(request.user.id)
+        if type(data) is Response:
+            return data
+
+        serializer = CartDetailsSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        cache.delete(request.user.id)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CartDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        data = get_cart(request.user.id)
+        if type(data) is Response:
+            return data
+
+        serializer = CartDetailsSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        serializer = CartDetailsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cache.set(request.user.id, serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OrderDetailsView(APIView):
@@ -29,9 +75,9 @@ class OrderDetailsView(APIView):
 
 # TODO Maybe change the url to something like product/<str:pk>/add
 class OrderItemsViewSet(ModelViewSet):
-    serializer_class = OrderItemsSerializer
+    serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return OrderItems.objects.filter(order__user=self.request.user)
+        return OrderItem.objects.filter(order__user=self.request.user)
 # TODO check how ordering products without account is done

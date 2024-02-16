@@ -24,19 +24,33 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
             .aggregate(total=Sum('product__price')).get('total')
 
 
-class CartItemSerializer(serializers.Serializer):
-    quantity = serializers.IntegerField()
-    order = serializers.IntegerField()
-    product = serializers.IntegerField()
-
+class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        model = OrderItem
+        fields = ['quantity', 'product']
+
+    # Update if there will be a need for creating singular item
+    def create(self, validated_data):
+        for item in validated_data:
+            OrderItem.objects.create(**item)
 
 
-class CartDetailsSerializer(serializers.Serializer):
+class CartDetailsSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True)
-    total = serializers.FloatField()
-    user = serializers.IntegerField()
 
     class Meta:
-        fields = '__all__'
+        model = OrderDetails
+        fields = ['total', 'items']
+
+    def create(self, validated_data):
+        print('create', validated_data)
+        items = validated_data.pop('items')
+        order = OrderDetails.objects.create(**validated_data)
+        print(items)
+
+        if items:
+            [item.update({'order': order}) for item in items]
+            print(items)
+            CartItemSerializer().create(items)
+
+        return order

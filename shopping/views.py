@@ -12,23 +12,42 @@ from shopping.serializers import (CartDetailsSerializer,
                                   OrderItemSerializer)
 
 
+def get_cart(id):
+    data = cache.get(id)
+    if not data:
+        return Response({'error': 'No data assigned to the given key.'},
+                        status=status.HTTP_204_NO_CONTENT)
+    return data
+
+
+class CheckoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        data = get_cart(request.user.id)
+        if type(data) is Response:
+            return data
+
+        serializer = CartDetailsSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        cache.delete(request.user.id)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class CartDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        data = cache.get(request.user.id)
-        if not data:
-            return Response({'error': 'No data assigned to the given key.'},
-                            status=status.HTTP_204_NO_CONTENT)
+        data = get_cart(request.user.id)
+        if type(data) is Response:
+            return data
 
         serializer = CartDetailsSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        data = request.data
-        data.update({'user': request.user.id})
-
         serializer = CartDetailsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         cache.set(request.user.id, serializer.data)

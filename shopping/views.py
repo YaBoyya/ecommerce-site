@@ -53,6 +53,21 @@ class CartDetailsView(APIView):
         cache.set(request.user.id, serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def delete(self, request, format=None):
+        cache.delete(request.user.id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, format=None):
+        serializer = CartDetailsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        old_data = cache.get(request.user.id)
+        cache.set(request.user.id, serializer.data)
+
+        if old_data:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class OrderDetailsView(APIView):
     permission_classes = [IsAuthenticated]

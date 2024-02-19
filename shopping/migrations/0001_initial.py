@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('core', '0002_remove_discount_active_discount_is_active_and_more'),
+        ('core', '0002_remove_discount_active_discount_is_active_and_more_squashed_0003_alter_discount_deleted_at_alter_discount_modified_at_and_more'),
     ]
 
     operations = [

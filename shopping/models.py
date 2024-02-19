@@ -9,6 +9,7 @@ class OrderDetails(BaseECommerceModel):
                              on_delete=models.CASCADE,
                              null=True, blank=True)
     total = models.DecimalField(max_digits=6, decimal_places=2)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = 'OrderDetails'

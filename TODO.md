@@ -21,12 +21,12 @@ As a user:
 Shopping app
 As a user:
 [o] I want to be a ble to check order history
-[ ] I want to be able to add products to my cart
-[ ] I want to be able to delete products from my cart
-[ ] I want to be able to delete all products from my cart
-[ ] I want my cart to not clear itself when i go offline
-[ ] I want to be able to increase quantity of products in my cart
-[ ] I want to be able to check my cart 
+[o] I want to be able to add products to my cart
+[o] I want to be able to delete products from my cart
+[o] I want to be able to delete all products from my cart
+[?] I want my cart to not clear itself when i go offline NOTE: it has TTL, perhaps increase it to couple hours - currently 15 min
+[?] I want to be able to increase quantity of products in my cart NOTE: by updating the cart
+[o] I want to be able to check my cart 
 [ ] I want to be able to use shopping without the need of having an account
 
 - Redis shopping cart storage DONE

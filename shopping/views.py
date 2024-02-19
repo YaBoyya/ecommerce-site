@@ -69,6 +69,7 @@ class CartDetailsView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# TODO rethink order related view item ones especially
 class OrderDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 

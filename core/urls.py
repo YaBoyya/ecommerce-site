@@ -4,7 +4,7 @@ from . import views
 
 
 app_name = 'core'
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=False)
 
 router.register('management/product', views.ProductManagementViewSet,
                 basename='m-product')

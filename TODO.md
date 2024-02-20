@@ -4,7 +4,7 @@ Core app
 As a user:
 [o] I want to be able to browse products
 [o] I want to be able to check product details
-[ ] I want products to have a visible discount
+[o] I want products to have a visible discount
 [o] I want products to be categorized
 
 
@@ -20,7 +20,7 @@ As a user:
 
 Shopping app
 As a user:
-[o] I want to be a ble to check order history
+[o] I want to be able to check order history
 [o] I want to be able to add products to my cart
 [o] I want to be able to delete products from my cart
 [o] I want to be able to delete all products from my cart

@@ -69,7 +69,6 @@ class CartDetailsView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-# TODO rethink order related view item ones especially
 class OrderDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -77,7 +76,6 @@ class OrderDetailsView(APIView):
         return OrderDetails.objects.filter(user=self.request.user,
                                            is_active=True)
 
-    # TODO decide what it should show either list or latest order
     def get(self, request, format=None):
         session = self.get_queryset()
         serializer = OrderDetailsSerializer(session, many=True)

@@ -46,7 +46,7 @@ class Product(ECommerceModel):
     inventory = models.OneToOneField('core.ProductInventory', null=True,
                                      related_name='product',
                                      on_delete=models.CASCADE)
-    price = models.FloatField(_('Price'))
+    price = models.DecimalField(_('Price'), max_digits=5, decimal_places=2)
     discount = models.ForeignKey('core.Discount', blank=True, null=True,
                                  related_name='product',
                                  on_delete=models.SET_NULL)

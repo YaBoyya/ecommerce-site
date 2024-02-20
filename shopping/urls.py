@@ -8,6 +8,7 @@ from shopping import views
 router = DefaultRouter(trailing_slash=False)
 app_name = 'shopping'
 
+# TODO Is this viewset really needed?
 router.register('order/item', views.OrderItemsViewSet, basename='order-item')
 
 urlpatterns = router.urls

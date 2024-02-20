@@ -7,10 +7,31 @@ class ProductSerializer(serializers.ModelSerializer):
     serializer_class = Product
     queryset = Product.objects.all()
 
+    category = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
+    inventory = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = '__all__'
-        depth = 1
+
+    def get_category(self, obj):
+        return {"id": obj.category.id,
+                "name": obj.category.name,
+                "desc": obj.category.desc}
+
+    def get_discount(self, obj):
+        return {
+            "id": obj.discount.id,
+            "discount_percent": obj.discount.discount_percent,
+            "discounted_price": round(
+                obj.price * (100 - obj.discount.discount_percent) / 100,
+                2)
+            } if obj.discount and obj.discount.is_active else None
+
+    def get_inventory(self, obj):
+        return {"id": obj.inventory.id,
+                "quantity": obj.inventory.quantity}
 
 
 class ProductInventorySerializer(serializers.ModelSerializer):

@@ -3,14 +3,18 @@ from datetime import datetime, timedelta
 import json
 import random
 
+from django.contrib.auth.hashers import PBKDF2PasswordHasher
 import faker
 
 
+hasher = PBKDF2PasswordHasher()
 faker = faker.Faker()
 
+fixture = []
 discount_count = 5
 product_category_count = 10
 product_count = 100
+user_count = 10
 
 
 def generate_time(end_time=None):
@@ -24,7 +28,6 @@ def not_naive(time):
 
 
 def generate_product():
-    fixture = []
     for i in range(1, product_count + 1):
         name = faker.word()
         fixture.append(
@@ -45,12 +48,9 @@ def generate_product():
                 }
             }
         )
-    with open('./fixtures/product.json', 'w') as outfile:
-        json.dump(fixture, outfile)
 
 
 def generate_product_category():
-    fixture = []
     for i in range(1, product_count + 1):
         fixture.append(
             {
@@ -63,12 +63,9 @@ def generate_product_category():
                 }
             }
         )
-    with open('./fixtures/product_category.json', 'w') as outfile:
-        json.dump(fixture, outfile)
 
 
 def generate_product_inventory():
-    fixture = []
     for i in range(1, product_count + 1):
         fixture.append(
             {
@@ -80,12 +77,9 @@ def generate_product_inventory():
                 }
             }
         )
-    with open('./fixtures/product_inventory.json', 'w') as outfile:
-        json.dump(fixture, outfile)
 
 
 def generate_discount():
-    fixture = []
     for i in range(1, discount_count + 1):
         fixture.append(
             {
@@ -100,11 +94,51 @@ def generate_discount():
                 }
             }
         )
-    with open('./fixtures/discount.json', 'w') as outfile:
-        json.dump(fixture, outfile)
+
+
+def generate_user():
+    for i in range(1, user_count + 1):
+        fixture.append(
+            {
+                'model': 'users.ECommerceUser',
+                'pk': i,
+                'fields': {
+                    'username': faker.user_name(),
+                    'email': faker.email(),
+                    'password': hasher.encode(faker.password(), str(i)),
+                    'first_name': faker.first_name(),
+                    'last_name': faker.last_name()
+                }
+            }
+        )
+
+
+def generate_useraddress():
+    for i in range(1, user_count + 1):
+        fixture.append(
+            {
+                'model': 'users.UserAddress',
+                'pk': i,
+                'fields': {
+                    'user': i,
+                    'address_line1': faker.address(),
+                    'address_line2': faker.address(),
+                    'city': faker.city(),
+                    'postal_code': faker.postalcode(),
+                    'country': faker.country(),
+                    'telephone': faker.phone_number(),
+                    'mobile': faker.phone_number()
+                }
+            }
+        )
 
 
 generate_product()
 generate_product_category()
 generate_product_inventory()
 generate_discount()
+generate_user()
+generate_useraddress()
+
+with open('./fixtures/fixture.json', 'w') as outfile:
+    json.dump(fixture, outfile)

@@ -154,6 +154,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 25,
 }
 
+
+# Knox token auth
 REST_KNOX = {
     'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
     'AUTH_TOKEN_CHARACTER_LENGTH': 64,  # default: 64
@@ -164,6 +166,8 @@ REST_KNOX = {
     'EXPIRY_DATETIME_FORMAT': api_settings.DATETIME_FORMAT,
 }
 
+
+# Redis in-memory database
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 
@@ -176,3 +180,7 @@ CACHES = {
         }
     }
 }
+
+# Stripe payment
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')

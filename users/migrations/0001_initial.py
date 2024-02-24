@@ -6,7 +6,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
 import phone_field.models
-import users.managers
 
 
 class Migration(migrations.Migration):
@@ -40,9 +39,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-            managers=[
-                ('objects', users.managers.ECommerceUserManager()),
-            ],
         ),
         migrations.CreateModel(
             name='UserAddress',

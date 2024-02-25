@@ -9,8 +9,8 @@ class OrderDetails(BaseECommerceModel):
                              related_name='orders',
                              on_delete=models.CASCADE,
                              null=True, blank=True)
-    total = models.DecimalField(max_digits=6, decimal_places=2)
-    is_active = models.BooleanField(default=True)
+    total = models.DecimalField(_('total'), max_digits=6, decimal_places=2)
+    is_active = models.BooleanField(_('is active'), default=True)
 
     class Meta:
         verbose_name_plural = 'OrderDetails'
@@ -22,3 +22,34 @@ class OrderItem(BaseECommerceModel):
                               on_delete=models.CASCADE)
     product = models.ForeignKey('core.Product', on_delete=models.CASCADE)
     quantity = models.IntegerField(_('quantity'), default=1)
+
+
+class Payment(BaseECommerceModel):
+    class CurrencyOptions(models.TextChoices):
+        EUR = ('EUR', 'eur')
+        PLN = ('PLN', 'pln')
+        USD = ('USD', 'usd')
+
+    class PaymentStatus(models.TextChoices):
+        DECLINED = ('DECLINED', _('Declined'))
+        FAILED = ('FAILED', _('Failed'))
+        PENDING = ('PENDING', _('Pending'))
+        PROCESSING = ('PROCESSING', _('Processing'))
+        SETTLED = ('SETTLED', _('Settled'))
+
+    class PaymentMethod(models.TextChoices):
+        BLIK = ('BLIK', 'blik')
+        CARD = ('CARD', 'card')
+
+    order = models.OneToOneField(OrderDetails,
+                                 related_name='payment',
+                                 on_delete=models.DO_NOTHING)
+    price = models.DecimalField(max_digits=5,
+                                decimal_places=2)
+    currency = models.CharField(max_length=100,
+                                choices=CurrencyOptions.choices)
+    status = models.CharField(max_length=100,
+                              choices=PaymentStatus.choices,
+                              default=PaymentStatus.PENDING)
+    method = models.CharField(max_length=100,
+                              choices=PaymentMethod.choices)

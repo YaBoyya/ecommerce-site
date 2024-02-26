@@ -1,15 +1,16 @@
 from django.contrib.auth import login
+from django.db import IntegrityError
 
-from rest_framework import generics
-from rest_framework.response import Response
+from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from knox.views import LoginView as KnoxLoginView
 
 from shopping.models import OrderDetails
 from shopping.serializers import OrderDetailsSerializer
-from users.serializers import UserSerializer, AuthSerializer
+from users.serializers import UserSerializer, AuthSerializer, ReviewSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -47,3 +48,19 @@ class OrderHistoryView(APIView):
         history = self.get_queryset()
         serializer = OrderDetailsSerializer(history, many=True)
         return Response(serializer.data)
+
+
+class ReviewView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReviewSerializer
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.save(user=request.user)
+        except IntegrityError:
+            msg = {'error':
+                   'Review duplicate from given user under this product.'}
+            return Response(msg, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)

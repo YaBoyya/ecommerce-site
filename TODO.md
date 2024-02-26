@@ -30,6 +30,8 @@ As a user:
 [ ] I want to be able to use shopping without the need of having an account
 
 - Redis shopping cart storage DONE
+TODO add review mean or no reviews to products
+TODO Anonymous comments under a product
 TODO Filtering and sorting products
 TODO Filtering by category etc (fancy)
 TODO Order History details, probably after payment is

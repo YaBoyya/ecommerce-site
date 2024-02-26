@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from users.models import ECommerceUser
+from users.models import ECommerceUser, Review
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,3 +42,17 @@ class AuthSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['product', 'title', 'desc', 'rating']
+
+    def validate(self, attrs):
+        rating = attrs['rating']
+
+        if rating > 5 or rating < 1:
+            msg = _('Invalid rating value, should be in range 1-5.')
+            raise serializers.ValidationError(msg)
+        return super().validate(attrs)

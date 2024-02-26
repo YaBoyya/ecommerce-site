@@ -1,18 +1,15 @@
 from rest_framework import serializers
 
-from .models import Discount, Product, ProductCategory, ProductInventory
+from core import models
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    serializer_class = Product
-    queryset = Product.objects.all()
-
     category = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
     inventory = serializers.SerializerMethodField()
 
     class Meta:
-        model = Product
+        model = models.Product
         fields = '__all__'
 
     def get_category(self, obj):
@@ -35,27 +32,18 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductInventorySerializer(serializers.ModelSerializer):
-    serializer_class = ProductInventory
-    queryset = ProductInventory.objects.all()
-
     class Meta:
-        model = ProductInventory
+        model = models.ProductInventory
         fields = '__all__'
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
-    serializer_class = ProductCategory
-    queryset = ProductCategory.objects.all()
-
     class Meta:
-        model = ProductCategory
+        model = models.ProductCategory
         fields = '__all__'
 
 
 class DiscountSerializer(serializers.ModelSerializer):
-    serializer_class = Discount
-    queryset = Discount.objects.all()
-
     class Meta:
-        model = Discount
+        model = models.Discount
         fields = '__all__'

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from phone_field.models import PhoneField
 
-from core.models import BaseECommerceModel
+from core.models import BaseECommerceModel, ECommerceModel
 
 
 # TODO add oauth2
@@ -29,6 +29,7 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         super().save(*args, **kwargs)
 
 
+# TODO make it updatable
 class UserAddress(models.Model):
     user = models.ForeignKey(ECommerceUser, on_delete=models.CASCADE)
     address_line1 = models.CharField(_('address 1'), max_length=300,
@@ -40,3 +41,19 @@ class UserAddress(models.Model):
     country = models.CharField(_('country'), max_length=150, blank=True)
     telephone = PhoneField(_('telephone'))
     mobile = PhoneField(_('mobile'))
+
+
+class Review(ECommerceModel):
+    user = models.ForeignKey(ECommerceUser, on_delete=models.CASCADE)
+    product = models.ForeignKey('core.Product', on_delete=models.CASCADE)
+    title = models.CharField(_('title'), max_length=100)
+    desc = models.TextField()
+    rating = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                "user",
+                "product",
+                name="unique_product_review")
+        ]

@@ -1,10 +1,12 @@
 asgiref==3.7.2
+async-timeout==4.0.3
 cffi==1.16.0
 coverage==7.4.0
 cryptography==42.0.1
 Django==4.2.7
 django-debug-toolbar==4.2.0
 django-phone-field==1.8.1
+django-redis==5.4.0
 django-rest-knox==4.2.0
 djangorestframework==3.14.0
 Faker==22.5.0
@@ -14,6 +16,8 @@ pycparser==2.21
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 pytz==2023.3.post1
+redis==5.0.1
 six==1.16.0
 sqlparse==0.4.4
+typing_extensions==4.10.0
 tzdata==2023.4

@@ -25,7 +25,7 @@ class CheckoutView(APIView):
 
     def post(self, request, format=None):
         data = get_cart(request.user.id)
-        if type(data) is Response:
+        if isinstance(data, Response):
             return data
 
         serializer = CartDetailsSerializer(data=data)
@@ -40,7 +40,7 @@ class CartDetailsView(APIView):
 
     def get(self, request, format=None):
         data = get_cart(request.user.id)
-        if type(data) is Response:
+        if isinstance(data, Response):
             return data
 
         serializer = CartDetailsSerializer(data=data)
@@ -55,7 +55,7 @@ class CartDetailsView(APIView):
 
     def delete(self, request, format=None):
         cache.delete(request.user.id)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK)
 
     def put(self, request, format=None):
         serializer = CartDetailsSerializer(data=request.data)

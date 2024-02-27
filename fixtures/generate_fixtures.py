@@ -29,19 +29,11 @@ def not_naive(time):
 
 
 def pseudorandom(M, N, max):
-    tups = []
-    i = 1
-    while (True):
+    tups = set()
+    while (len(tups) <= max):
         tup = (random.randrange(1, M), random.randrange(1, N))
-        tups.append(tup)
-        if i % max == 0:
-            tups = list(set(tups))
-            i = len(tups)
-            print(i)
-            if i == max:
-                break
-        i += 1
-    return tups
+        tups.add(tup)
+    return list(tups)
 
 
 def generate_product():

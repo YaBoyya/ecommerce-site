@@ -14,7 +14,8 @@ fixture = []
 discount_count = 5
 product_category_count = 10
 product_count = 100
-user_count = 10
+user_count = 20
+review_count = user_count * 50
 
 
 def generate_time(end_time=None):
@@ -25,6 +26,22 @@ def generate_time(end_time=None):
 
 def not_naive(time):
     return str(time).replace(" ", "T")[:-3] + "Z"
+
+
+def pseudorandom(M, N, max):
+    tups = []
+    i = 1
+    while (True):
+        tup = (random.randrange(1, M), random.randrange(1, N))
+        tups.append(tup)
+        if i % max == 0:
+            tups = list(set(tups))
+            i = len(tups)
+            print(i)
+            if i == max:
+                break
+        i += 1
+    return tups
 
 
 def generate_product():
@@ -96,6 +113,26 @@ def generate_discount():
         )
 
 
+def generate_review():
+    rand_id = pseudorandom(user_count, product_count, review_count)
+    for i in range(1, review_count + 1):
+        user, product = rand_id[i-1]
+        fixture.append(
+            {
+                'model': 'users.Review',
+                'pk': i,
+                'fields': {
+                    'user': user,
+                    'product': product,
+                    'title': faker.text(max_nb_chars=100),
+                    'desc': faker.text(max_nb_chars=300),
+                    'rating': random.randrange(1, 6),
+                    'created_at': generate_time()
+                }
+            }
+        )
+
+
 def generate_user():
     for i in range(1, user_count + 1):
         fixture.append(
@@ -137,6 +174,7 @@ generate_product()
 generate_product_category()
 generate_product_inventory()
 generate_discount()
+generate_review()
 generate_user()
 generate_useraddress()
 

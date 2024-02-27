@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from phone_field.models import PhoneField
@@ -55,5 +56,19 @@ class Review(ECommerceModel):
             models.UniqueConstraint(
                 "user",
                 "product",
-                name="unique_product_review")
+                name="unique_product_user_review")
+        ]
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(ECommerceUser, on_delete=models.CASCADE)
+    product = models.ForeignKey('core.Product', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                "user",
+                "product",
+                name="unique_product_user_wishlist")
         ]

@@ -3,6 +3,8 @@ from django.db.models.signals import post_delete, pre_delete
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from core.managers import ProductManager
+
 
 class BaseECommerceModel(models.Model):
     created_at = models.DateTimeField(_('Created at'), default=timezone.now)
@@ -50,6 +52,8 @@ class Product(ECommerceModel):
     discount = models.ForeignKey('core.Discount', blank=True, null=True,
                                  related_name='product',
                                  on_delete=models.SET_NULL)
+
+    objects = ProductManager()
 
     class Meta:
         verbose_name_plural = 'Products'

@@ -7,6 +7,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
     inventory = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Product
@@ -29,6 +30,9 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_inventory(self, obj):
         return {"id": obj.inventory.id,
                 "quantity": obj.inventory.quantity}
+
+    def get_rating(self, obj):
+        return obj.rating
 
 
 class ProductInventorySerializer(serializers.ModelSerializer):

@@ -10,19 +10,19 @@ from knox.views import LoginView as KnoxLoginView
 
 from shopping.models import OrderDetails
 from shopping.serializers import OrderDetailsSerializer
-from users.serializers import UserSerializer, AuthSerializer, ReviewSerializer
+from users import serializers
+from users.models import Wishlist
 
 
 class CreateUserView(generics.CreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
 
 
 class LoginView(KnoxLoginView):
-    serializer_class = AuthSerializer
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
-        serializer = AuthSerializer(data=request.data)
+        serializer = serializers.AuthSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
@@ -30,7 +30,7 @@ class LoginView(KnoxLoginView):
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
@@ -52,7 +52,7 @@ class OrderHistoryView(APIView):
 
 class ReviewView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = ReviewSerializer
+    serializer_class = serializers.ReviewSerializer
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
@@ -64,3 +64,33 @@ class ReviewView(generics.GenericAPIView):
                    'Review duplicate from given user under this product.'}
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class WishlistView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = serializers.WishlistSerializer
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    def post(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.save(user=request.user)
+        except IntegrityError:
+            msg = {'error':
+                   'Wishlist duplicate from given user under this product.'}
+            return Response(msg, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def get(self, request, format=None):
+        wishlist = self.get_queryset()
+        serializer = self.get_serializer(wishlist, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk=None, format=None):
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_200_OK)
+# TODO test wishlist view

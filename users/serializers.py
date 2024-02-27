@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
-from users.models import ECommerceUser, Review
+from users.models import ECommerceUser, Review, Wishlist
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -56,3 +56,11 @@ class ReviewSerializer(serializers.ModelSerializer):
             msg = _('Invalid rating value, should be in range 1-5.')
             raise serializers.ValidationError(msg)
         return super().validate(attrs)
+
+
+class WishlistSerializer(serializers.ModelSerializer):
+    created_at = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Wishlist
+        fields = ['product', 'created_at']

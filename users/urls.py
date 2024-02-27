@@ -11,6 +11,10 @@ urlpatterns = [
 
     path('profile', views.ManageUserView.as_view(), name='profile'),
     path('profile/history', views.OrderHistoryView.as_view(), name='history'),
+    path('profile/wishlist', views.WishlistView.as_view(), name='wishlist'),
+    path('profile/wishlist/<str:pk>',
+         views.WishlistView.as_view(),
+         name='wishlist-delete'),
 
     path('login', views.LoginView.as_view(), name='knox_login'),
     path('logout', knox_views.LogoutView.as_view(), name='knox_logout'),

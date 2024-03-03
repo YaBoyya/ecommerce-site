@@ -40,3 +40,13 @@ TODO Order History details, probably after payment is
 TODO User notification when a product from a wishlist is on a discount
 TODO User notification when a product will be available
 TODO Oauth2
+
+
+TODO allow passing order in paymentserializer if it's status is not
+TODO Update ProductInventory after creating OrderItem
+TODO maybe change payment url to checkout/payment/id url
+TODO add check if user has stripe_id
+TODO check total value from cart to payment\
+TODO add update order status
+
+TODO refactor serializers add short versions and long version and put them in correct places

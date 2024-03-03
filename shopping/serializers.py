@@ -2,7 +2,7 @@ from django.db.models import Sum
 
 from rest_framework import serializers
 
-from shopping.models import OrderItem, OrderDetails
+from shopping.models import OrderItem, OrderDetails, Payment
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -40,17 +40,28 @@ class CartDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderDetails
-        fields = ['total', 'items']
+        fields = ['id', 'items', 'total']
+        extra_kwargs = {'id': {'read_only': True}}
 
     def create(self, validated_data):
-        print('create', validated_data)
-        items = validated_data.pop('items')
+        items = validated_data.pop('items', None)
         order = OrderDetails.objects.create(**validated_data)
-        print(items)
 
         if items:
             [item.update({'order': order}) for item in items]
-            print(items)
             CartItemSerializer().create(items)
 
         return order
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    token = serializers.CharField()
+
+    class Meta:
+        model = Payment
+        fields = [
+            'order',
+            'currency',
+            'method',
+            'token'
+        ]

@@ -18,4 +18,5 @@ urlpatterns += [
 
     path('cart', views.CartDetailsView.as_view(), name='cart'),
     path('checkout', views.CheckoutView.as_view(), name='checkout'),
+    path('checkout/payment', views.PaymentView.as_view(), name='payment'),
 ]

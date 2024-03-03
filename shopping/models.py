@@ -5,12 +5,20 @@ from core.models import BaseECommerceModel
 
 
 class OrderDetails(BaseECommerceModel):
+    class OrderStatus(models.TextChoices):
+        ARCHIVED = ('ARCHIVED', _('archived'))
+        CANCELED = ('CANCELED', _('canceled'))
+        FULFILLED = ('FULFILLED', _('fulfilled'))
+        OPEN = ('OPEN', _('open'))
+
     user = models.ForeignKey('users.ECommerceUser',
                              related_name='orders',
                              on_delete=models.CASCADE,
                              null=True, blank=True)
     total = models.DecimalField(_('total'), max_digits=6, decimal_places=2)
-    is_active = models.BooleanField(_('is active'), default=True)
+    status = models.CharField(_('status'),
+                              choices=OrderStatus.choices,
+                              default=OrderStatus.OPEN)
 
     class Meta:
         verbose_name_plural = 'OrderDetails'
@@ -31,11 +39,10 @@ class Payment(BaseECommerceModel):
         USD = ('USD', 'usd')
 
     class PaymentStatus(models.TextChoices):
-        DECLINED = ('DECLINED', _('Declined'))
-        FAILED = ('FAILED', _('Failed'))
-        PENDING = ('PENDING', _('Pending'))
-        PROCESSING = ('PROCESSING', _('Processing'))
-        SETTLED = ('SETTLED', _('Settled'))
+        CANCELED = ('CANCELED', _('canceled'))
+        FAILED = ('FAILED', _('failed'))
+        PENDING = ('PENDING', _('pending'))
+        SUCCEEDED = ('SUCCEEDED', _('succeeded'))
 
     class PaymentMethod(models.TextChoices):
         BLIK = ('BLIK', 'blik')
@@ -44,8 +51,8 @@ class Payment(BaseECommerceModel):
     order = models.OneToOneField(OrderDetails,
                                  related_name='payment',
                                  on_delete=models.DO_NOTHING)
-    price = models.DecimalField(max_digits=5,
-                                decimal_places=2)
+    amount = models.DecimalField(max_digits=5,
+                                 decimal_places=2)
     currency = models.CharField(max_length=100,
                                 choices=CurrencyOptions.choices)
     status = models.CharField(max_length=100,

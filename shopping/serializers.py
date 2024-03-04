@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
@@ -65,3 +66,16 @@ class PaymentSerializer(serializers.ModelSerializer):
             'method',
             'token'
         ]
+        extra_kwargs = {'order': {'validators': []}}
+
+    def validate_order(self, obj):
+        if not obj:
+            msg = _("Order must be specified")
+            raise serializers.ValidationError(msg)
+
+        if (hasattr(obj, "payment") and
+                obj.payment.status == Payment.PaymentStatus.SUCCEEDED):
+            msg = _("This order already has a payment that succeeded.")
+            raise serializers.ValidationError(msg)
+
+        return obj

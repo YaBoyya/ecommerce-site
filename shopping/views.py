@@ -127,9 +127,11 @@ class PaymentView(APIView):
         if response['status'] == "succeeded":
             Payment.objects.update_or_create(
                 **data_dict,
-                status=Payment.PaymentStatus.SUCCEEDED)
+                defaults={'status': Payment.PaymentStatus.SUCCEEDED})
         else:
-            Payment.objects.update_or_create(**data_dict)
+            Payment.objects.update_or_create(
+                **data_dict,
+                defaults=data_dict)
 
         return Response(response, status=response['http_status'])
 

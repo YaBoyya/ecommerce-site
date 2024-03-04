@@ -154,7 +154,7 @@ def generate_useraddress():
                     'address_line2': faker.address(),
                     'city': faker.city(),
                     'postal_code': faker.postalcode(),
-                    'country': faker.country(),
+                    'country': faker.country_code(),
                     'telephone': faker.phone_number(),
                     'mobile': faker.phone_number()
                 }

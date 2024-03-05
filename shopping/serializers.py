@@ -1,9 +1,19 @@
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
 from shopping.models import OrderItem, OrderDetails, Payment
+
+
+class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
+    def __init__(self, method_name=None, **kwargs):
+        self.method_name = method_name
+        kwargs['source'] = '*'
+        super(serializers.SerializerMethodField, self).__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        return {self.field_name: data}
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -14,15 +24,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderDetailsSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
-    total = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderDetails
         fields = '__all__'
-
-    def get_total(self, obj):
-        return OrderItem.objects.filter(order=obj)\
-            .aggregate(total=Sum('product__price')).get('total')
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -37,6 +42,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class CartDetailsSerializer(serializers.ModelSerializer):
+    total = ReadWriteSerializerMethodField(required=False)
     items = CartItemSerializer(many=True)
 
     class Meta:
@@ -53,6 +59,25 @@ class CartDetailsSerializer(serializers.ModelSerializer):
             CartItemSerializer().create(items)
 
         return order
+
+    def get_total(self, obj):
+        """
+            Returns total cost of cart items
+            When reading obj is an OrderedDict,
+            but when writing it is a QuerySet
+        """
+        total = 0
+
+        try:
+            items = obj['items']
+            for item in items:
+                total += item['quantity'] * item['product'].price
+        except TypeError:
+            items = obj.items.all()
+            total = items.aggregate(
+                total=Sum(F('quantity') * F('product__price'))).get('total')
+
+        return total
 
 
 class PaymentSerializer(serializers.ModelSerializer):

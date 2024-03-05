@@ -1,10 +1,10 @@
 from django.core.cache import cache
 from django.conf import settings
 
-from rest_framework import status
+from rest_framework import mixins, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 import stripe
@@ -73,12 +73,15 @@ class CartDetailsView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class OrderDetailsView(APIView):
+class OrderDetailsViewSet(mixins.ListModelMixin,
+                          mixins.RetrieveModelMixin,
+                          mixins.UpdateModelMixin,
+                          GenericViewSet):
+    serializer_class = OrderDetailsSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return OrderDetails.objects.filter(user=self.request.user,
-                                           is_active=True)
+        return OrderDetails.objects.filter(user=self.request.user)
 
     def get(self, request, format=None):
         session = self.get_queryset()

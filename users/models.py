@@ -44,6 +44,7 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
                 "city": address.city,
                 "country": address.country,
                 "line1": address.address_line1,
+                "line2": address.address_line2,
                 "postal_code": address.postal_code
             },
             phone=address.mobile if address.mobile else address.telephone
@@ -62,6 +63,7 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
                 "city": address.city,
                 "country": address.country,
                 "line1": address.address_line1,
+                "line2": address.address_line2,
                 "postal_code": address.postal_code
             },
             phone=address.mobile if address.mobile else address.telephone

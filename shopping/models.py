@@ -15,7 +15,7 @@ class OrderDetails(BaseECommerceModel):
                              related_name='orders',
                              on_delete=models.CASCADE,
                              null=True, blank=True)
-    total = models.DecimalField(_('total'), max_digits=6, decimal_places=2)
+    total = models.DecimalField(_('total'), max_digits=9, decimal_places=2)
     status = models.CharField(_('status'),
                               choices=OrderStatus.choices,
                               default=OrderStatus.OPEN)
@@ -51,7 +51,7 @@ class Payment(BaseECommerceModel):
     order = models.OneToOneField(OrderDetails,
                                  related_name='payment',
                                  on_delete=models.DO_NOTHING)
-    amount = models.DecimalField(max_digits=5,
+    amount = models.DecimalField(max_digits=9,
                                  decimal_places=2)
     currency = models.CharField(max_length=100,
                                 choices=CurrencyOptions.choices)

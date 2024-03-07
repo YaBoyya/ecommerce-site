@@ -28,6 +28,23 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDetails
         fields = '__all__'
+        extra_kwargs = {'total': {'read_only': True}}
+
+    def validate(self, attrs):
+        status = attrs['status']
+
+        try:
+            id = self.instance.id
+            old_instance = OrderDetails.objects.get(id=id)
+            print(old_instance.status)
+            if old_instance.status == OrderDetails.OrderStatus.CANCELED\
+                    and old_instance.status != status:
+                msg = _('You cannot activate canceled order')
+                raise serializers.ValidationError(msg)
+        except OrderDetails.DoesNotExist:
+            pass
+
+        return attrs
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -39,6 +56,16 @@ class CartItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         for item in validated_data:
             OrderItem.objects.create(**item)
+
+    def validate(self, attrs):
+        quantity = attrs['quantity']
+        product = attrs['product']
+
+        if product.inventory.quantity < quantity:
+            msg = _(f"Product {product.id} quantity is bigger than its stock")
+            raise serializers.ValidationError(msg)
+
+        return attrs
 
 
 class CartDetailsSerializer(serializers.ModelSerializer):

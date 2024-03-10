@@ -3,7 +3,7 @@ from rest_framework import serializers
 from core import models
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class FeedSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
     inventory = serializers.SerializerMethodField()
@@ -11,28 +11,47 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Product
-        fields = '__all__'
+        fields = [
+            'name', 'category', 'rating',
+            'inventory', 'price', 'discount'
+        ]
 
     def get_category(self, obj):
-        return {"id": obj.category.id,
-                "name": obj.category.name,
-                "desc": obj.category.desc}
+        return obj.category.name
 
     def get_discount(self, obj):
         return {
-            "id": obj.discount.id,
+            "discounted_price":
+                round(
+                    obj.price * (100 - obj.discount.discount_percent) / 100,
+                    2
+                ),
+            "discount_percent": obj.discount.discount_percent
+        } if obj.discount and obj.discount.is_active else None
+
+    def get_inventory(self, obj):
+        return obj.inventory.quantity
+
+    def get_rating(self, obj):
+        return obj.rating
+
+
+class ProductSerializer(FeedSerializer):
+    def get_category(self, obj):
+        return {
+            "name": obj.category.name,
+            "desc": obj.category.desc
+        }
+
+    def get_discount(self, obj):
+        return {
+            "name": obj.discount.name,
+            "desc": obj.discount.desc,
             "discount_percent": obj.discount.discount_percent,
             "discounted_price": round(
                 obj.price * (100 - obj.discount.discount_percent) / 100,
                 2)
-            } if obj.discount and obj.discount.is_active else None
-
-    def get_inventory(self, obj):
-        return {"id": obj.inventory.id,
-                "quantity": obj.inventory.quantity}
-
-    def get_rating(self, obj):
-        return obj.rating
+        } if obj.discount and obj.discount.is_active else None
 
 
 class ProductInventorySerializer(serializers.ModelSerializer):

@@ -9,7 +9,11 @@ from core.models import Discount, Product, ProductCategory, ProductInventory
 class IndexViewSet(ProductSearchMixin,
                    viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all().order_by('id')
-    serializer_class = serializers.ProductSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.FeedSerializer
+        return serializers.ProductSerializer
 
 
 class ProductManagementViewSet(ProductSearchMixin,

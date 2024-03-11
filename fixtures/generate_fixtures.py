@@ -36,7 +36,7 @@ def pseudorandom(M, N, max):
     return list(tups)
 
 
-def generate_product():
+def generate_product(test: bool):
     for i in range(1, product_count + 1):
         name = faker.word()
         fixture.append(
@@ -44,6 +44,17 @@ def generate_product():
                 'model': 'core.Product',
                 'pk': i,
                 'fields': {
+                    'name': f'test{i}',
+                    'desc': f'testtesttest{i}',
+                    'SKU': f'{i}te{faker.random_number(5)}',
+                    'category':
+                        random.randrange(1, product_category_count + 1),
+                    'inventory': i,
+                    'price': round(random.uniform(0, 100), 2),
+                    'discount': random.choice(
+                        [None, random.randrange(1, discount_count + 1)]),
+                    'created_at': generate_time()
+                } if test else {
                     'name': name,
                     'desc': faker.text(max_nb_chars=100),
                     'SKU': f'{i}{name[:2]}{faker.random_number(5)}',
@@ -59,13 +70,17 @@ def generate_product():
         )
 
 
-def generate_product_category():
-    for i in range(1, product_count + 1):
+def generate_product_category(test: bool):
+    for i in range(1, product_category_count + 1):
         fixture.append(
             {
                 'model': 'core.ProductCategory',
                 'pk': i,
                 'fields': {
+                    'name': f'test{i}',
+                    'desc': f'testtesttest{i}',
+                    'created_at': generate_time()
+                } if test else {
                     'name': faker.word(),
                     'desc': faker.text(max_nb_chars=100),
                     'created_at': generate_time()
@@ -74,7 +89,7 @@ def generate_product_category():
         )
 
 
-def generate_product_inventory():
+def generate_product_inventory(test: bool):
     for i in range(1, product_count + 1):
         fixture.append(
             {
@@ -88,13 +103,19 @@ def generate_product_inventory():
         )
 
 
-def generate_discount():
+def generate_discount(test: bool):
     for i in range(1, discount_count + 1):
         fixture.append(
             {
                 'model': 'core.Discount',
                 'pk': i,
                 'fields': {
+                    'name': f'test{i}',
+                    'desc': f'testtesttest{i}',
+                    'discount_percent': random.randrange(1, 101),
+                    'is_active': bool(random.getrandbits(1)),
+                    'created_at': generate_time()
+                } if test else {
                     'name': faker.word(),
                     'desc': faker.text(max_nb_chars=100),
                     'discount_percent': random.randrange(1, 101),
@@ -105,7 +126,7 @@ def generate_discount():
         )
 
 
-def generate_review():
+def generate_review(test: bool):
     rand_id = pseudorandom(user_count, product_count, review_count)
     for i in range(1, review_count + 1):
         user, product = rand_id[i-1]
@@ -114,6 +135,13 @@ def generate_review():
                 'model': 'users.Review',
                 'pk': i,
                 'fields': {
+                    'user': user,
+                    'product': product,
+                    'title': f'test{1}',
+                    'desc': f'testtesttesttesttest{1}',
+                    'rating': random.randrange(1, 6),
+                    'created_at': generate_time()
+                } if test else {
                     'user': user,
                     'product': product,
                     'title': faker.text(max_nb_chars=100),
@@ -125,13 +153,19 @@ def generate_review():
         )
 
 
-def generate_user():
+def generate_user(test: bool):
     for i in range(1, user_count + 1):
         fixture.append(
             {
                 'model': 'users.ECommerceUser',
                 'pk': i,
                 'fields': {
+                    'username': f'test{i}',
+                    'email': f'test{i}@email.com',
+                    'password': hasher.encode(f'TestTest{i}', str(i)),
+                    'first_name': f'Test{i}',
+                    'last_name': f'Test{i}'
+                } if test else {
                     'username': faker.user_name(),
                     'email': faker.email(),
                     'password': hasher.encode(faker.password(), str(i)),
@@ -142,13 +176,22 @@ def generate_user():
         )
 
 
-def generate_useraddress():
+def generate_useraddress(test: bool):
     for i in range(1, user_count + 1):
         fixture.append(
             {
                 'model': 'users.UserAddress',
                 'pk': i,
                 'fields': {
+                    'user': i,
+                    'address_line1': f'test {i}',
+                    'address_line2': f'test {i}',
+                    'city': f'Test{i}',
+                    'postal_code': i,
+                    'country': f'Test{i}',
+                    'telephone': faker.phone_number(),
+                    'mobile': faker.phone_number()
+                } if test else {
                     'user': i,
                     'address_line1': faker.address(),
                     'address_line2': faker.address(),
@@ -162,13 +205,20 @@ def generate_useraddress():
         )
 
 
-generate_product()
-generate_product_category()
-generate_product_inventory()
-generate_discount()
-generate_review()
-generate_user()
-generate_useraddress()
+def run_generate(test):
+    path = ('./fixtures/test_fixture.json' if test
+            else './fixtures/fixture.json')
 
-with open('./fixtures/fixture.json', 'w') as outfile:
-    json.dump(fixture, outfile)
+    generate_product(test)
+    generate_product_category(test)
+    generate_product_inventory(test)
+    generate_discount(test)
+    generate_review(test)
+    generate_user(test)
+    generate_useraddress(test)
+
+    with open(path, 'w') as outfile:
+        json.dump(fixture, outfile)
+
+
+run_generate(True)

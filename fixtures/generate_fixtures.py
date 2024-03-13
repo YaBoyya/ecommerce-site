@@ -16,6 +16,7 @@ product_category_count = 10
 product_count = 100
 user_count = 20
 review_count = user_count * 50
+wishlist_count = user_count * 10
 
 
 def generate_time(end_time=None):
@@ -126,33 +127,6 @@ def generate_discount(test: bool):
         )
 
 
-def generate_review(test: bool):
-    rand_id = pseudorandom(user_count, product_count, review_count)
-    for i in range(1, review_count + 1):
-        user, product = rand_id[i-1]
-        fixture.append(
-            {
-                'model': 'users.Review',
-                'pk': i,
-                'fields': {
-                    'user': user,
-                    'product': product,
-                    'title': f'test{1}',
-                    'desc': f'testtesttesttesttest{1}',
-                    'rating': random.randrange(1, 6),
-                    'created_at': generate_time()
-                } if test else {
-                    'user': user,
-                    'product': product,
-                    'title': faker.text(max_nb_chars=100),
-                    'desc': faker.text(max_nb_chars=300),
-                    'rating': random.randrange(1, 6),
-                    'created_at': generate_time()
-                }
-            }
-        )
-
-
 def generate_user(test: bool):
     for i in range(1, user_count + 1):
         fixture.append(
@@ -205,6 +179,50 @@ def generate_useraddress(test: bool):
         )
 
 
+def generate_review(test: bool):
+    rand_id = pseudorandom(user_count, product_count, review_count)
+    for i in range(1, review_count + 1):
+        user, product = rand_id[i-1]
+        fixture.append(
+            {
+                'model': 'users.Review',
+                'pk': i,
+                'fields': {
+                    'user': user,
+                    'product': product,
+                    'title': f'test{1}',
+                    'desc': f'testtesttesttesttest{1}',
+                    'rating': random.randrange(1, 6),
+                    'created_at': generate_time()
+                } if test else {
+                    'user': user,
+                    'product': product,
+                    'title': faker.text(max_nb_chars=100),
+                    'desc': faker.text(max_nb_chars=300),
+                    'rating': random.randrange(1, 6),
+                    'created_at': generate_time()
+                }
+            }
+        )
+
+
+def generate_wishlist(test: bool):
+    rand_id = pseudorandom(user_count, product_count, wishlist_count)
+    for i in range(1, wishlist_count + 1):
+        user, product = rand_id[i-1]
+        fixture.append(
+            {
+                'model': 'users.Review',
+                'pk': i,
+                'fields': {
+                    'user': user,
+                    'product': product,
+                    'created_at': generate_time()
+                }
+            }
+        )
+
+
 def run_generate(test):
     path = ('./fixtures/test_fixture.json' if test
             else './fixtures/fixture.json')
@@ -221,4 +239,4 @@ def run_generate(test):
         json.dump(fixture, outfile)
 
 
-run_generate(True)
+run_generate(False)

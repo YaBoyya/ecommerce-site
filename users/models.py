@@ -27,10 +27,8 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         super().clean_fields(exclude=exclude)
 
     def save(self, *args, **kwargs):
-        if self.stripe_id:
-            self.stripe_update_user()
         if self._password is not None:
-            password_validation.vwalidate_password(self._password, self)
+            password_validation.validate_password(self._password, self)
             password_validation.password_changed(self._password, self)
             self._password = None
         super().save(*args, **kwargs)
@@ -96,6 +94,11 @@ class UserAddress(models.Model):
     country = models.CharField(_('country'), max_length=150, blank=True)
     telephone = PhoneField(_('telephone'), null=True, blank=True)
     mobile = PhoneField(_('mobile'), null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.user.stripe_id:
+            self.user.stripe_update_user()
+        super().save(*args, **kwargs)
 
 
 class Review(ECommerceModel):

@@ -13,7 +13,6 @@ from stripe import Customer
 from core.models import BaseECommerceModel, ECommerceModel
 
 
-# TODO add oauth2
 class ECommerceUser(BaseECommerceModel, AbstractUser):
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
@@ -24,15 +23,21 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
     stripe_id = models.CharField(max_length=50, blank=True, null=True)
 
     def clean_fields(self, exclude=None):
-        super().clean_fields(exclude=exclude)
         self.email = self.__class__.objects.normalize_email(self.email)
+        super().clean_fields(exclude=exclude)
 
     def save(self, *args, **kwargs):
+        if self.stripe_id:
+            self.stripe_update_user()
         if self._password is not None:
-            password_validation.validate_password(self._password, self)
+            password_validation.vwalidate_password(self._password, self)
             password_validation.password_changed(self._password, self)
             self._password = None
         super().save(*args, **kwargs)
+
+    def delete(self):
+        self.stripe_delete_user()
+        super().delete()
 
     def stripe_create_user(self):
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -69,6 +74,10 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
             phone=address.mobile if address.mobile else address.telephone
         )
         self.save()
+
+    def stripe_delete_user(self):
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        Customer.delete(sid=self.user.id)
 
     def get_name(self) -> str:
         if self.first_name and self.last_name:

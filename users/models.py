@@ -34,7 +34,8 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         super().save(*args, **kwargs)
 
     def delete(self):
-        self.stripe_delete_user()
+        if self.stripe_id:
+            self.stripe_delete_user()
         super().delete()
 
     def stripe_create_user(self):
@@ -75,7 +76,7 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
 
     def stripe_delete_user(self):
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        Customer.delete(sid=self.user.id)
+        Customer.delete(sid=self.stripe_id)
 
     def get_name(self) -> str:
         if self.first_name and self.last_name:
@@ -96,9 +97,9 @@ class UserAddress(models.Model):
     mobile = PhoneField(_('mobile'), null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if self.user.stripe_id:
             self.user.stripe_update_user()
-        super().save(*args, **kwargs)
 
 
 class Review(ECommerceModel):

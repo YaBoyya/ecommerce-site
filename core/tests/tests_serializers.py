@@ -42,6 +42,7 @@ class TestProductSerializer(TestCase):
 
     def test_category_field_content(self):
         data = {
+            'id': self.product.category.id,
             'name': self.product.category.name,
             'desc': self.product.category.desc
         }
@@ -52,6 +53,7 @@ class TestProductSerializer(TestCase):
 
     def test_discount_field_content_exists(self):
         data = {
+            'id': self.product.discount.id,
             "name": self.product.discount.name,
             "desc": self.product.discount.desc,
             "discount_percent": self.product.discount.discount_percent,

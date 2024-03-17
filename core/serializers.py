@@ -12,15 +12,19 @@ class FeedSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Product
         fields = [
-            'name', 'category', 'rating',
+            'id', 'name', 'category', 'rating',
             'inventory', 'price', 'discount'
         ]
 
     def get_category(self, obj):
-        return obj.category.name
+        return {
+            "id": obj.category.id,
+            "name": obj.category.name
+        }
 
     def get_discount(self, obj):
         return {
+            "id": obj.discount.id,
             "discounted_price":
                 round(
                     obj.price * (100 - obj.discount.discount_percent) / 100,
@@ -39,12 +43,14 @@ class FeedSerializer(serializers.ModelSerializer):
 class ProductSerializer(FeedSerializer):
     def get_category(self, obj):
         return {
+            "id": obj.category.id,
             "name": obj.category.name,
             "desc": obj.category.desc
         }
 
     def get_discount(self, obj):
         return {
+            "id": obj.discount.id,
             "name": obj.discount.name,
             "desc": obj.discount.desc,
             "discount_percent": obj.discount.discount_percent,

@@ -68,13 +68,13 @@ class TestECommerceUser(TestCase):
         self.useraddress.save()
         self.assertNotEqual(
             city,
-            Customer.retrieve(id=self.user.stripe_id)['address']['city']
+            self.user.stripe_retrieve_user()['address']['city']
         )
 
     def test_delete_user(self):
         self.user.stripe_create_user()
         self.user.delete()
-        self.assertTrue(Customer.retrieve(self.user.stripe_id)['deleted'])
+        self.assertTrue(self.user.stripe_retrieve_user()['deleted'])
 
     def test_get_name(self):
         self.assertIsNone(self.user.get_name())

@@ -78,6 +78,10 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         stripe.api_key = settings.STRIPE_SECRET_KEY
         Customer.delete(sid=self.stripe_id)
 
+    def stripe_retrieve_user(self):
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        return Customer.retrieve(self.stripe_id)
+
     def get_name(self) -> str:
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"

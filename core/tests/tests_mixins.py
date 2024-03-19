@@ -21,6 +21,7 @@ class TestSearchMixin(APITestCase):
         self.token = f'Token {AuthToken.objects.create(user=self.user)[-1]}'
 
     def test_list_search(self):
+        """Listing view will return correct items"""
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['count'], 10)
@@ -65,6 +66,7 @@ class TestProductSearchMixin(APITestCase):
             inventory=self.inventory2)
 
     def test_list_search(self):
+        """Listing view will return correct products"""
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['count'], 2)
 

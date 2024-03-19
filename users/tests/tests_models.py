@@ -45,11 +45,14 @@ class TestECommerceUser(TestCase):
             self.user.save()
 
     def test_stripe_create_user_valid_data(self):
+        """Stripe create method creates customer correctly with valid data"""
         self.assertIsNone(self.user.stripe_id)
         self.user.stripe_create_user()
         self.assertIsNotNone(self.user.stripe_id)
 
     def test_stripe_create_user_invalid_data(self):
+        """Stripe create method raises ValidationError
+           when invalid data is given"""
         user = ECommerceUser.objects.create(
             username='test1',
             email='test1@example.com',
@@ -61,6 +64,7 @@ class TestECommerceUser(TestCase):
         self.assertIsNone(user.stripe_id)
 
     def test_stripe_update_user_valid_data(self):
+        """Stripe update method updates customer correctly with valid data"""
         self.user.stripe_create_user()
         city = self.useraddress.city
 
@@ -72,11 +76,15 @@ class TestECommerceUser(TestCase):
         )
 
     def test_delete_user(self):
+        """When user account is delete,
+           stripe customer is deleted accordingly"""
         self.user.stripe_create_user()
         self.user.delete()
         self.assertTrue(self.user.stripe_retrieve_user()['deleted'])
 
     def test_get_name(self):
+        """get_name method returns None when there are no credentials
+           and first_name second_name when they are not None"""
         self.assertIsNone(self.user.get_name())
         self.user.first_name = 'Test'
         self.user.last_name = 'Test'
@@ -102,6 +110,7 @@ class TestUserAddress(TestCase):
         )
 
     def test_user_stripe_save(self):
+        """save methods updates stripe account accordingly"""
         self.user.stripe_create_user()
         city = self.useraddress.city
         self.useraddress.city = 'Test-Test'

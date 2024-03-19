@@ -14,6 +14,7 @@ class TestIndexViewSet(APITestCase):
         self.product = Product.objects.first()
 
     def test_details_view_serializer(self):
+        """Details view uses expected serializer"""
         serializer = serializers.ProductSerializer(self.product)
         response = self.client.get(
             reverse('core:index-detail',
@@ -21,6 +22,7 @@ class TestIndexViewSet(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_list_view_serializer(self):
+        """List view uses expected serializer"""
         serializer = serializers.FeedSerializer(self.product)
         response = self.client.get(
             reverse('core:index-list',

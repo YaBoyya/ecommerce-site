@@ -21,6 +21,7 @@ class TestFeedSerializer(TestCase):
         self.serializer_no_disc = ProductSerializer(self.product_no_disc)
 
     def test_contains_expected_fields(self):
+        """Feed serializer consists of expected fields"""
         data = self.serializer.data
         self.assertEqual(list(data.keys()), FeedSerializer.Meta.fields)
 
@@ -41,6 +42,7 @@ class TestProductSerializer(TestCase):
         self.serializer_no_disc = ProductSerializer(self.product_no_disc)
 
     def test_category_field_content(self):
+        """Category field has expected content"""
         data = {
             'id': self.product.category.id,
             'name': self.product.category.name,
@@ -49,9 +51,11 @@ class TestProductSerializer(TestCase):
         self.assertEqual(self.serializer.data['category'], data)
 
     def test_discount_field_content_not_exists(self):
+        """Discount field returns none if product has no associated discount"""
         self.assertEqual(self.serializer_no_disc.data['discount'], None)
 
     def test_discount_field_content_exists(self):
+        """Discount field has expected content"""
         data = {
             'id': self.product.discount.id,
             "name": self.product.discount.name,

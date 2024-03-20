@@ -70,7 +70,7 @@ class AuthSerializer(serializers.Serializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['product', 'title', 'desc', 'rating']
+        fields = ['id', 'product', 'title', 'desc', 'rating']
 
     def validate(self, attrs):
         rating = attrs['rating']

@@ -30,9 +30,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {'total': {'read_only': True}}
 
-    def validate(self, attrs):
-        status = attrs['status']
-
+    def validate_status(self, status):
         try:
             id = self.instance.id
             old_instance = OrderDetails.objects.get(id=id)
@@ -44,7 +42,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         except OrderDetails.DoesNotExist:
             pass
 
-        return attrs
+        return status
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -120,14 +118,14 @@ class PaymentSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {'order': {'validators': []}}
 
-    def validate_order(self, obj):
-        if not obj:
+    def validate_order(self, order):
+        if not order:
             msg = _("Order must be specified")
             raise serializers.ValidationError(msg)
 
-        if (hasattr(obj, "payment") and
-                obj.payment.status == Payment.PaymentStatus.SUCCEEDED):
+        if (hasattr(order, "payment") and
+                order.payment.status == Payment.PaymentStatus.SUCCEEDED):
             msg = _("This order already has a payment that succeeded.")
             raise serializers.ValidationError(msg)
 
-        return obj
+        return order

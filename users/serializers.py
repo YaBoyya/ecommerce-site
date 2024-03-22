@@ -72,13 +72,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ['id', 'product', 'title', 'desc', 'rating']
 
-    def validate(self, attrs):
-        rating = attrs['rating']
-
+    def validate_rating(self, rating):
         if rating > 5 or rating < 1:
             msg = _('Invalid rating value, should be in range 1-5.')
             raise serializers.ValidationError(msg)
-        return super().validate(attrs)
+        return rating
 
 
 class WishlistSerializer(serializers.ModelSerializer):

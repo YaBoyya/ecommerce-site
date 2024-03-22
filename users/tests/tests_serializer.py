@@ -139,7 +139,7 @@ class TestReviewSerializer(TestCase):
             serializer.is_valid(raise_exception=True)
         self.assertIn(
             _('Invalid rating value, should be in range 1-5.'),
-            list(map(str, serializer.errors['non_field_errors'])))
+            list(map(str, serializer.errors['rating'])))
 
         self.data.update({'rating': 10})
         serializer = ReviewSerializer(data=self.data)
@@ -147,4 +147,4 @@ class TestReviewSerializer(TestCase):
             serializer.is_valid(raise_exception=True)
         self.assertIn(
             _('Invalid rating value, should be in range 1-5.'),
-            list(map(str, serializer.errors['non_field_errors'])))
+            list(map(str, serializer.errors['rating'])))

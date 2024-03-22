@@ -21,5 +21,5 @@ urlpatterns = [
     path('logoutall', knox_views.LogoutAllView.as_view(), name='knox_logoutall'),  # noqa
 
     path('review', views.ReviewView.as_view(), name='review'),
-    path('review/<str:pk>', views.ReviewView.as_view(), name='review'),
+    path('review/<str:pk>', views.ReviewView.as_view(), name='review-details'),
 ]

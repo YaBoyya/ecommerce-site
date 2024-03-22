@@ -5,8 +5,9 @@ from rest_framework.test import APITestCase
 
 from knox.models import AuthToken
 
+from core.models import Product
 from shopping.models import OrderDetails
-from users.models import ECommerceUser
+from users.models import ECommerceUser, Review
 
 
 class TestLoginView(APITestCase):
@@ -80,3 +81,72 @@ class TestOrderHistoryView(APITestCase):
         response = self.client.get(self.url, format='json')
         self.assertEqual(len(response.data), len(self.user1.orders.all()))
         self.assertNotIn(self.filtered, response.data)
+
+
+class TestReviewView(APITestCase):
+    fixtures = ['./fixtures/test_fixture.json']
+
+    def setUp(self):
+        self.url = reverse('users:review')
+        self.user = ECommerceUser.objects.create_user(
+            username='test',
+            email='test@email.com',
+            password='test')
+        self.token = f"Token {AuthToken.objects.create(user=self.user)[-1]}"
+        self.data = {
+            "product": 1,
+            "title": "Test!",
+            "desc": "TestTest",
+            "rating": "5"
+        }
+        self.product = Product.objects.get(id=12)
+        self.review = Review.objects.create(
+            user=self.user,
+            product=self.product,
+            title="Other Test",
+            desc="This is a test",
+            rating=2
+        )
+        self.details_url = reverse('users:review-details',
+                                   kwargs={'pk': self.review.id})
+
+    def test_post_unique_data(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        response = self.client.post(self.url, data=self.data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_post_duplicate_data(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        self.client.post(self.url, data=self.data)
+        response = self.client.post(self.url, data=self.data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            'Review duplicate from given user under this product.',
+            response.data['error']
+        )
+
+    def test_delete(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        response = self.client.delete(self.details_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_put(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        new_data = {
+            'user': self.user.id,
+            'product': self.product.id,
+            'title': 'put',
+            'desc': 'This is a test',
+            'rating': '4'
+        }
+        response = self.client.put(self.details_url, new_data)
+        self.assertNotEqual(response.data['title'], self.data['title'])
+        self.assertNotEqual(response.data['rating'], self.data['rating'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        response = self.client.patch(self.details_url, {'title': 'patch'})
+        self.assertNotEqual(response.data['title'], self.data['title'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

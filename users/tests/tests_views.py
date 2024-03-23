@@ -44,11 +44,11 @@ class TestManageUserView(APITestCase):
             'password': 'test'
         }
         user = ECommerceUser.objects.create_user(**self.data)
-        self.token = f"Token {AuthToken.objects.create(user=user)[-1]}"
+        token = f"Token {AuthToken.objects.create(user=user)[-1]}"
+        self.client.credentials(HTTP_AUTHORIZATION=token)
         self.url = reverse('users:profile')
 
     def test_user_profile_valid_token(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -58,13 +58,11 @@ class TestManageUserView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_change_email(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.patch(self.url, {'email': 'newmail@gmail.com'})
         self.assertNotEqual(self.data['email'], response.data['email'])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_change_password(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.patch(self.url, {'password': 'NewPassword123'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -79,7 +77,8 @@ class TestOrderHistoryView(APITestCase):
             username='test2',
             email='test2@email.com',
             password='test2')
-        self.token = f"Token {AuthToken.objects.create(user=self.user1)[-1]}"
+        token = f"Token {AuthToken.objects.create(user=self.user1)[-1]}"
+        self.client.credentials(HTTP_AUTHORIZATION=token)
         self.url = reverse('users:history')
         OrderDetails.objects.create(user=self.user1, total='1')
         self.filtered = OrderDetails.objects.create(user=self.user2, total='1')
@@ -88,7 +87,6 @@ class TestOrderHistoryView(APITestCase):
         """
         User history filters out all orders not related to user
         """
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.get(self.url, format='json')
         self.assertEqual(len(response.data), len(self.user1.orders.all()))
         self.assertNotIn(self.filtered, response.data)
@@ -103,7 +101,8 @@ class TestReviewView(APITestCase):
             username='test',
             email='test@email.com',
             password='test')
-        self.token = f"Token {AuthToken.objects.create(user=self.user)[-1]}"
+        token = f"Token {AuthToken.objects.create(user=self.user)[-1]}"
+        self.client.credentials(HTTP_AUTHORIZATION=token)
         self.data = {
             "product": 1,
             "title": "Test!",
@@ -122,12 +121,10 @@ class TestReviewView(APITestCase):
                                    kwargs={'pk': self.review.id})
 
     def test_post_unique_data(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.post(self.url, data=self.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_duplicate_data(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         self.client.post(self.url, data=self.data)
         response = self.client.post(self.url, data=self.data)
 
@@ -138,12 +135,10 @@ class TestReviewView(APITestCase):
         )
 
     def test_delete(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.delete(self.details_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_put(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         new_data = {
             'user': self.user.id,
             'product': self.product.id,
@@ -157,7 +152,6 @@ class TestReviewView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_patch(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.patch(self.details_url, {'title': 'patch'})
         self.assertNotEqual(response.data['title'], self.data['title'])
         self.assertEqual(response.status_code, status.HTTP_200_OK)

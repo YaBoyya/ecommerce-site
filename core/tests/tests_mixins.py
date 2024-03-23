@@ -18,11 +18,11 @@ class TestSearchMixin(APITestCase):
             email='admin@email.com',
             password='Admin123'
         )
-        self.token = f'Token {AuthToken.objects.create(user=self.user)[-1]}'
+        token = f'Token {AuthToken.objects.create(user=self.user)[-1]}'
+        self.client.credentials(HTTP_AUTHORIZATION=token)
 
     def test_list_search(self):
         """Listing view will return correct items"""
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.data['count'], 10)
 

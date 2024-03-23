@@ -35,7 +35,6 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        self.request.user.stripe_create_user()
         return self.request.user
 
     def perform_update(self, serializer):

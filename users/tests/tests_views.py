@@ -38,12 +38,12 @@ class TestLoginView(APITestCase):
 
 class TestManageUserView(APITestCase):
     def setUp(self):
-        data = {
+        self.data = {
             'username': 'test',
             'email': 'test@email.com',
             'password': 'test'
         }
-        user = ECommerceUser.objects.create_user(**data)
+        user = ECommerceUser.objects.create_user(**self.data)
         self.token = f"Token {AuthToken.objects.create(user=user)[-1]}"
         self.url = reverse('users:profile')
 
@@ -56,6 +56,17 @@ class TestManageUserView(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='invalid')
         response = self.client.get(self.url, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_user_change_email(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        response = self.client.patch(self.url, {'email': 'newmail@gmail.com'})
+        self.assertNotEqual(self.data['email'], response.data['email'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_change_password(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+        response = self.client.patch(self.url, {'password': 'NewPassword123'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class TestOrderHistoryView(APITestCase):

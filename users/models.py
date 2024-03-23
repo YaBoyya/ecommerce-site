@@ -27,7 +27,7 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         super().clean_fields(exclude=exclude)
 
     def save(self, *args, **kwargs):
-        if self._password is not None:
+        if self._password:
             password_validation.validate_password(self._password, self)
             password_validation.password_changed(self._password, self)
             self._password = None
@@ -57,22 +57,23 @@ class ECommerceUser(BaseECommerceModel, AbstractUser):
         self.save()
 
     def stripe_update_user(self):
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        address = self.useraddress_set.first()
-        Customer.modify(
-            id=self.stripe_id,
-            name=self.get_name(),
-            email=self.email,
-            address={
-                "city": address.city,
-                "country": address.country,
-                "line1": address.address_line1,
-                "line2": address.address_line2,
-                "postal_code": address.postal_code
-            },
-            phone=address.mobile if address.mobile else address.telephone
-        )
-        self.save()
+        if self.stripe_id:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            address = self.useraddress_set.first()
+            Customer.modify(
+                id=self.stripe_id,
+                name=self.get_name(),
+                email=self.email,
+                address={
+                    "city": address.city,
+                    "country": address.country,
+                    "line1": address.address_line1,
+                    "line2": address.address_line2,
+                    "postal_code": address.postal_code
+                },
+                phone=address.mobile if address.mobile else address.telephone
+            )
+            self.save()
 
     def stripe_delete_user(self):
         stripe.api_key = settings.STRIPE_SECRET_KEY

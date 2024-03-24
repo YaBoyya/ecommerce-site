@@ -83,12 +83,16 @@ class ReviewView(mixins.DestroyModelMixin,
         return self.partial_update(request, *args, **kwargs)
 
 
-class WishlistView(generics.GenericAPIView):
+class WishlistView(mixins.ListModelMixin,
+                   generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.WishlistSerializer
 
     def get_queryset(self):
         return Wishlist.objects.filter(user=self.request.user)
+
+    def get_object(self, pk):
+        return Wishlist.objects.get(id=pk)
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
@@ -97,16 +101,14 @@ class WishlistView(generics.GenericAPIView):
             serializer.save(user=request.user)
         except IntegrityError:
             msg = {'error':
-                   'Wishlist duplicate from given user under this product.'}
+                   _('Wishlist duplicate from given user under this product.')}
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def get(self, request, format=None):
-        wishlist = self.get_queryset()
-        serializer = self.get_serializer(wishlist, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-    def delete(self, request, format=None):
-        instance = self.get_object()
+    def delete(self, request, pk, format=None):
+        instance = self.get_object(pk)
         instance.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

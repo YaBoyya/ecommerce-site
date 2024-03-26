@@ -13,7 +13,7 @@ class TestECommerceUser(TestCase):
             email='test@example.com',
             password='test'
         )
-        self.useraddress = UserAddress.objects.create(
+        self.user_address = UserAddress.objects.create(
             user=self.user,
             address_line1='Test street',
             address_line2='Test street 2',
@@ -44,44 +44,6 @@ class TestECommerceUser(TestCase):
         with self.assertRaises(ValidationError):
             self.user.save()
 
-    def test_stripe_create_user_valid_data(self):
-        """Stripe create method creates customer correctly with valid data"""
-        self.assertIsNone(self.user.stripe_id)
-        self.user.stripe_create_user()
-        self.assertIsNotNone(self.user.stripe_id)
-
-    def test_stripe_create_user_invalid_data(self):
-        """Stripe create method raises ValidationError
-           when invalid data is given"""
-        user = ECommerceUser.objects.create(
-            username='test1',
-            email='test1@example.com',
-            password='test'
-        )
-        self.assertIsNone(user.stripe_id)
-        with self.assertRaises(AttributeError):
-            user.stripe_create_user()
-        self.assertIsNone(user.stripe_id)
-
-    def test_stripe_update_user_valid_data(self):
-        """Stripe update method updates customer correctly with valid data"""
-        self.user.stripe_create_user()
-        city = self.useraddress.city
-
-        self.useraddress.city = 'Different City'
-        self.useraddress.save()
-        self.assertNotEqual(
-            city,
-            self.user.stripe_retrieve_user()['address']['city']
-        )
-
-    def test_delete_user(self):
-        """When user account is delete,
-           stripe customer is deleted accordingly"""
-        self.user.stripe_create_user()
-        self.user.delete()
-        self.assertTrue(self.user.stripe_retrieve_user()['deleted'])
-
     def test_get_name(self):
         """get_name method returns None when there are no credentials
            and first_name second_name when they are not None"""
@@ -99,7 +61,7 @@ class TestUserAddress(TestCase):
             email='test@example.com',
             password='test'
         )
-        self.useraddress = UserAddress.objects.create(
+        self.user_address = UserAddress.objects.create(
             user=self.user,
             address_line1='Test street',
             address_line2='Test street 2',
@@ -109,13 +71,39 @@ class TestUserAddress(TestCase):
             telephone='123456789'
         )
 
-    def test_user_stripe_save(self):
+    def test_useraddress_stripe_save(self):
         """save methods updates stripe account accordingly"""
-        self.user.stripe_create_user()
-        city = self.useraddress.city
-        self.useraddress.city = 'Test-Test'
-        self.useraddress.save()
+        self.user_address.stripe_create_user()
+        city = self.user_address.city
+        self.user_address.city = 'Test-Test'
+        self.user_address.save()
         self.assertNotEqual(
             city,
-            Customer.retrieve(self.user.stripe_id)['address']['city']
+            Customer.retrieve(self.user_address.stripe_id)['address']['city']
         )
+
+    def test_stripe_create_customer_valid_data(self):
+        """Stripe create method creates customer correctly with valid data"""
+        self.assertIsNone(self.user_address.stripe_id)
+        self.user_address.stripe_create_user()
+        self.assertIsNotNone(self.user_address.stripe_id)
+
+    def test_stripe_update_customer_valid_data(self):
+        """Stripe update method updates customer correctly with valid data"""
+        self.user_address.stripe_create_user()
+        city = self.user_address.city
+
+        self.user_address.city = 'Different City'
+        self.user_address.save()
+        self.assertNotEqual(
+            city,
+            self.user_address.stripe_retrieve_user()['address']['city']
+        )
+
+    def test_delete_useraddress(self):
+        """When user_address account is deleted,
+           stripe customer is deleted accordingly"""
+        self.user_address.stripe_create_user()
+        self.user_address.delete()
+        self.assertTrue(
+            self.user_address.stripe_retrieve_user()['deleted'])

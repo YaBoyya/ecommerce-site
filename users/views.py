@@ -12,7 +12,7 @@ from knox.views import LoginView as KnoxLoginView
 from shopping.models import OrderDetails
 from shopping.serializers import OrderDetailsSerializer
 from users import serializers
-from users.models import Review, Wishlist
+from users.models import ECommerceUser, Review, Wishlist
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -39,7 +39,10 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        instance.stripe_update_user()
+        try:
+            instance.user_address.stripe_update_user()
+        except ECommerceUser.user_address.RelatedObjectDoesNotExist:
+            pass
 
 
 class OrderHistoryView(APIView):

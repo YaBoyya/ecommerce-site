@@ -41,7 +41,7 @@ class TestUserSerializer(TestCase):
         self.data.update({'address': address})
 
         user = UserSerializer().create(self.data)
-        serializer = UserAddressSerializer(user.useraddress_set.first())
+        serializer = UserAddressSerializer(user.user_address)
 
         address.pop('user')
         self.assertEqual(address, serializer.data)

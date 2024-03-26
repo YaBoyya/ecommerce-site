@@ -34,7 +34,6 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
         try:
             id = self.instance.id
             old_instance = OrderDetails.objects.get(id=id)
-            print(old_instance.status)
             if old_instance.status == OrderDetails.OrderStatus.CANCELED\
                     and old_instance.status != status:
                 msg = _('You cannot activate canceled order')

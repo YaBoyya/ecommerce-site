@@ -28,7 +28,6 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDetails
         fields = '__all__'
-        extra_kwargs = {'total': {'read_only': True}}
 
     def validate_status(self, status):
         try:
@@ -38,7 +37,7 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
                     and old_instance.status != status:
                 msg = _('You cannot activate canceled order')
                 raise serializers.ValidationError(msg)
-        except OrderDetails.DoesNotExist:
+        except AttributeError:
             pass
 
         return status

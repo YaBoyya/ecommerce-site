@@ -48,11 +48,6 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['quantity', 'product']
 
-    # Update if there will be a need for creating singular item
-    def create(self, validated_data):
-        for item in validated_data:
-            OrderItem.objects.create(**item)
-
     def validate(self, attrs):
         quantity = attrs['quantity']
         product = attrs['product']
@@ -79,7 +74,9 @@ class CartDetailsSerializer(serializers.ModelSerializer):
 
         if items:
             [item.update({'order': order}) for item in items]
-            CartItemSerializer().create(items)
+            OrderItem.objects.bulk_create(
+                [OrderItem(**item) for item in items]
+            )
 
         return order
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import argparse
 from datetime import datetime, timedelta
 import json
 import random
@@ -223,7 +224,7 @@ def generate_wishlist(test: bool):
         )
 
 
-def run_generate(test):
+def run_generate(test: bool = False):
     path = ('./fixtures/test_fixture.json' if test
             else './fixtures/fixture.json')
 
@@ -239,4 +240,10 @@ def run_generate(test):
         json.dump(fixture, outfile)
 
 
-run_generate(False)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate fixtures')
+    parser.add_argument('--test', '-t', dest='test',
+                        action='store_true', default=False)
+    args = parser.parse_args()
+
+    run_generate(args.test)

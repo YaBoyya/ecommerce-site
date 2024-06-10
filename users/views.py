@@ -1,7 +1,8 @@
 from django.contrib.auth import login
 from django.db import IntegrityError
+from django.utils.translation import gettext_lazy as _
 
-from rest_framework import generics, status
+from rest_framework import generics, mixins, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,7 +12,7 @@ from knox.views import LoginView as KnoxLoginView
 from shopping.models import OrderDetails
 from shopping.serializers import OrderDetailsSerializer
 from users import serializers
-from users.models import Wishlist
+from users.models import ECommerceUser, Review, Wishlist
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -34,12 +35,14 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        self.request.user.stripe_create_user()
         return self.request.user
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        instance.stripe_update_user()
+        try:
+            instance.user_address.stripe_update_user()
+        except ECommerceUser.user_address.RelatedObjectDoesNotExist:
+            pass
 
 
 class OrderHistoryView(APIView):
@@ -55,9 +58,12 @@ class OrderHistoryView(APIView):
         return Response(serializer.data)
 
 
-class ReviewView(generics.GenericAPIView):
+class ReviewView(mixins.DestroyModelMixin,
+                 mixins.UpdateModelMixin,
+                 generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.ReviewSerializer
+    queryset = Review.objects.all()
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
@@ -66,18 +72,31 @@ class ReviewView(generics.GenericAPIView):
             serializer.save(user=request.user)
         except IntegrityError:
             msg = {'error':
-                   'Review duplicate from given user under this product.'}
+                   _('Review duplicate from given user under this product.')}
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
 
-class WishlistView(generics.GenericAPIView):
+class WishlistView(mixins.ListModelMixin,
+                   generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = serializers.WishlistSerializer
 
     def get_queryset(self):
         return Wishlist.objects.filter(user=self.request.user)
 
+    def get_object(self, pk):
+        return Wishlist.objects.get(id=pk)
+
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -85,17 +104,14 @@ class WishlistView(generics.GenericAPIView):
             serializer.save(user=request.user)
         except IntegrityError:
             msg = {'error':
-                   'Wishlist duplicate from given user under this product.'}
+                   _('Wishlist duplicate from given user under this product.')}
             return Response(msg, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def get(self, request, format=None):
-        wishlist = self.get_queryset()
-        serializer = self.get_serializer(wishlist, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-    def delete(self, request, pk=None, format=None):
-        instance = self.get_object()
+    def delete(self, request, pk, format=None):
+        instance = self.get_object(pk)
         instance.delete()
-        return Response(status=status.HTTP_200_OK)
-# TODO test wishlist view
+        return Response(status=status.HTTP_204_NO_CONTENT)

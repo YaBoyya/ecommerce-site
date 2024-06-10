@@ -17,8 +17,8 @@ class BaseECommerceModel(models.Model):
              using=None, update_fields=None):
         if not self._state.adding:
             self.modified_at = timezone.now()
-        super().save(force_insert, force_update, using, update_fields)
         self.clean_fields()
+        super().save(force_insert, force_update, using, update_fields)
 
 
 class ECommerceModel(BaseECommerceModel):

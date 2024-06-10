@@ -4,16 +4,16 @@ from core.models import Product, ProductCategory, ProductInventory
 
 
 class TestECommerceModel(TestCase):
+    fixtures = ['./fixtures/test_fixture.json']
+
     def setUp(self):
-        self.category = ProductCategory.objects.create(
-            name='test', desc='test')
         self.inventory = ProductInventory.objects.create(quantity=10)
         self.product_data = {
             'name': 'test',
             'desc': "It's a test",
             'SKU': 'SKUNUMBER',
             'price': '12.73',
-            'category': self.category,
+            'category': ProductCategory.objects.get(id=1),
             'inventory': self.inventory
         }
         self.model = Product.objects.create(**self.product_data)

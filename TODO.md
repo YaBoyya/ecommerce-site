@@ -13,4 +13,5 @@ TODO Oauth2
 
 TODO maybe change payment url to checkout/payment/id url
 
-TODO refactor serializers add short versions and long version and put them in correct places
+TODO url layout
+TODO add all links into root

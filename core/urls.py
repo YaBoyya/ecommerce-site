@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 
-from . import views
+from core import views
 
 
 app_name = 'core'

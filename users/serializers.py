@@ -54,18 +54,14 @@ class AuthSerializer(serializers.Serializer):
         username = attrs.get('username')
         password = attrs.get('password')
 
-        if username and password:
-            user = authenticate(
-                request=self.context.get('request'),
-                username=username,
-                password=password
-            )
-            if not user:
-                msg = _('Unable to log in with provided credentials')
-                raise serializers.ValidationError(msg, code='authentication')
-        else:
-            msg = _('Must include "username" and "password".')
-            raise serializers.ValidationError(msg, code='authorization')
+        user = authenticate(
+            request=self.context.get('request'),
+            username=username,
+            password=password
+        )
+        if not user:
+            msg = _('Unable to log in with provided credentials.')
+            raise serializers.ValidationError(msg, code='authentication')
 
         attrs['user'] = user
         return attrs
@@ -74,15 +70,13 @@ class AuthSerializer(serializers.Serializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['product', 'title', 'desc', 'rating']
+        fields = ['id', 'product', 'title', 'desc', 'rating']
 
-    def validate(self, attrs):
-        rating = attrs['rating']
-
+    def validate_rating(self, rating):
         if rating > 5 or rating < 1:
             msg = _('Invalid rating value, should be in range 1-5.')
             raise serializers.ValidationError(msg)
-        return super().validate(attrs)
+        return rating
 
 
 class WishlistSerializer(serializers.ModelSerializer):

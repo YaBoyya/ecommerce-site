@@ -28,34 +28,25 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDetails
         fields = '__all__'
-        extra_kwargs = {'total': {'read_only': True}}
 
-    def validate(self, attrs):
-        status = attrs['status']
-
+    def validate_status(self, status):
         try:
             id = self.instance.id
             old_instance = OrderDetails.objects.get(id=id)
-            print(old_instance.status)
             if old_instance.status == OrderDetails.OrderStatus.CANCELED\
                     and old_instance.status != status:
                 msg = _('You cannot activate canceled order')
                 raise serializers.ValidationError(msg)
-        except OrderDetails.DoesNotExist:
+        except AttributeError:
             pass
 
-        return attrs
+        return status
 
 
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['quantity', 'product']
-
-    # Update if there will be a need for creating singular item
-    def create(self, validated_data):
-        for item in validated_data:
-            OrderItem.objects.create(**item)
 
     def validate(self, attrs):
         quantity = attrs['quantity']
@@ -83,7 +74,9 @@ class CartDetailsSerializer(serializers.ModelSerializer):
 
         if items:
             [item.update({'order': order}) for item in items]
-            CartItemSerializer().create(items)
+            OrderItem.objects.bulk_create(
+                [OrderItem(**item) for item in items]
+            )
 
         return order
 
@@ -120,14 +113,16 @@ class PaymentSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {'order': {'validators': []}}
 
-    def validate_order(self, obj):
-        if not obj:
+    def validate_order(self, order):
+        if not order:
             msg = _("Order must be specified")
             raise serializers.ValidationError(msg)
 
-        if (hasattr(obj, "payment") and
-                obj.payment.status == Payment.PaymentStatus.SUCCEEDED):
+        # when user wants to create a payment instance for an order that
+        # has already been paid and succeeded
+        if (hasattr(order, "payment") and
+                order.payment.status == Payment.PaymentStatus.SUCCEEDED):
             msg = _("This order already has a payment that succeeded.")
             raise serializers.ValidationError(msg)
 
-        return obj
+        return order

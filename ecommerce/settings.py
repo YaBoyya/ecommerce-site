@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'shopping.apps.ShoppingConfig',
     'users.apps.UsersConfig',
 
+    'django_extensions',
     'rest_framework',
     'knox',
     'debug_toolbar',

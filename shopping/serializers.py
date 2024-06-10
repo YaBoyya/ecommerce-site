@@ -118,6 +118,8 @@ class PaymentSerializer(serializers.ModelSerializer):
             msg = _("Order must be specified")
             raise serializers.ValidationError(msg)
 
+        # when user wants to create a payment instance for an order that
+        # has already been paid and succeeded
         if (hasattr(order, "payment") and
                 order.payment.status == Payment.PaymentStatus.SUCCEEDED):
             msg = _("This order already has a payment that succeeded.")

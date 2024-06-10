@@ -8,7 +8,7 @@ from shopping import serializers
 
 
 class TesteadWriteSerializerMethodField(TestCase):
-    pass
+    pass  # TODO
 
 
 class TestOrderDetailsSerializer(TestCase):
@@ -155,3 +155,7 @@ class TestCartDetailsSerializer(TestCase):
         instance = serializer.save()
 
         self.assertEqual(instance.total, self.total)
+
+
+class TestPaymentSerializer(TestCase):
+    pass
